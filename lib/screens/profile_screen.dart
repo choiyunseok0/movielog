@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../widgets/common_app_bar.dart';
 import '../widgets/profile_header.dart';
+import '../widgets/profile_stats.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -23,7 +24,9 @@ class ProfileBody extends StatelessWidget {
     return const SafeArea(
       child: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-        child: ProfileHeader(),
+        child: Column(
+          children: [ProfileHeader(), SizedBox(height: 32), ProfileStats()],
+        ),
       ),
     );
   }
