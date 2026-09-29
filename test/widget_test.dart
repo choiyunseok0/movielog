@@ -2,11 +2,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:movielog/app.dart';
 
 void main() {
-  testWidgets('시작 화면의 주요 문구와 버튼이 표시된다', (tester) async {
+  testWidgets('프로필 헤더의 주요 정보가 표시된다', (tester) async {
     await tester.pumpWidget(const MovieLogApp());
 
-    expect(find.text('FLUTTER 1주차'), findsOneWidget);
-    expect(find.text('영화의 순간을\n기록하세요'), findsOneWidget);
-    expect(find.text('시작하기'), findsOneWidget);
+    expect(find.text('내 프로필'), findsOneWidget);
+    expect(find.text('무비러버'), findsOneWidget);
+    expect(find.text('좋아하는 영화를 기록하고 있어요'), findsOneWidget);
   });
 }
