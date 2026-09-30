@@ -9,29 +9,36 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: navigationShell,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: navigationShell.currentIndex,
-        onDestinationSelected: (index) {
-          navigationShell.goBranch(
-            index,
-            initialLocation: index == navigationShell.currentIndex,
-          );
-        },
-        destinations: [
-          _destination(context, assetPath: 'assets/icons/home.svg', label: '홈'),
-          _destination(
-            context,
-            assetPath: 'assets/icons/movie.svg',
-            label: '영화',
-          ),
-          _destination(
-            context,
-            assetPath: 'assets/icons/person.svg',
-            label: '마이',
-          ),
-        ],
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        body: navigationShell,
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: navigationShell.currentIndex,
+          onDestinationSelected: (index) {
+            navigationShell.goBranch(
+              index,
+              initialLocation: index == navigationShell.currentIndex,
+            );
+          },
+          destinations: [
+            _destination(
+              context,
+              assetPath: 'assets/icons/home.svg',
+              label: '홈',
+            ),
+            _destination(
+              context,
+              assetPath: 'assets/icons/movie.svg',
+              label: '영화',
+            ),
+            _destination(
+              context,
+              assetPath: 'assets/icons/person.svg',
+              label: '마이',
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -26,6 +26,52 @@ void main() {
     expect(find.text('회원가입'), findsWidgets);
   });
 
+  testWidgets('회원가입 검증이 완료되면 홈으로 이동하고 뒤로 가지 않는다', (tester) async {
+    await tester.pumpWidget(const MovieLogApp());
+    AppRouter.router.go('/register');
+    await tester.pumpAndSettle();
+
+    final initialRegisterButton = find.widgetWithText(ElevatedButton, '회원가입');
+    await tester.ensureVisible(initialRegisterButton);
+    await tester.tap(initialRegisterButton);
+    await tester.pump();
+    expect(find.text('닉네임을 입력해 주세요.'), findsOneWidget);
+    expect(find.text('이메일을 입력해 주세요.'), findsOneWidget);
+
+    await tester.ensureVisible(find.byKey(const Key('nicknameField')));
+    await tester.enterText(find.byKey(const Key('nicknameField')), '무비러버');
+    await tester.ensureVisible(find.byKey(const Key('emailField')));
+    await tester.enterText(
+      find.byKey(const Key('emailField')),
+      'movie@example.com',
+    );
+    await tester.ensureVisible(find.byKey(const Key('passwordField')));
+    await tester.enterText(
+      find.byKey(const Key('passwordField')),
+      'password123',
+    );
+    await tester.ensureVisible(find.byKey(const Key('passwordConfirmField')));
+    await tester.enterText(
+      find.byKey(const Key('passwordConfirmField')),
+      'password123',
+    );
+
+    final registerButton = find.widgetWithText(ElevatedButton, '회원가입');
+    await tester.ensureVisible(registerButton);
+    await tester.tap(registerButton);
+    await tester.pumpAndSettle();
+
+    expect(find.text('오늘은 어떤 영화를 볼까요?'), findsOneWidget);
+    expect(find.byType(NavigationBar), findsOneWidget);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('오늘은 어떤 영화를 볼까요?'), findsOneWidget);
+
+    AppRouter.router.go('/start');
+    await tester.pumpAndSettle();
+  });
+
   testWidgets('홈 영화 카드를 누르면 같은 영화의 상세 화면이 열린다', (tester) async {
     await tester.pumpWidget(const MovieLogApp());
     AppRouter.router.go('/home');
