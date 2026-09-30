@@ -1,15 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 import '../data/mock_movies.dart';
+import '../widgets/rating_dialog.dart';
 
-class MovieDetailScreen extends StatelessWidget {
+class MovieDetailScreen extends StatefulWidget {
   const MovieDetailScreen({super.key, required this.movieId});
 
   final int movieId;
 
   @override
+  State<MovieDetailScreen> createState() => _MovieDetailScreenState();
+}
+
+class _MovieDetailScreenState extends State<MovieDetailScreen> {
+  bool _isFavorite = false;
+  double? _myRating;
+
+  Future<void> _openRatingDialog() async {
+    final rating = await showDialog<double>(
+      context: context,
+      builder: (context) => RatingDialog(initialRating: _myRating ?? 0),
+    );
+
+    if (!mounted || rating == null) return;
+
+    setState(() {
+      _myRating = rating;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${rating.toStringAsFixed(1)}점 평점을 남겼습니다.'),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _toggleFavorite() {
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_isFavorite ? '즐겨찾기에 추가했습니다.' : '즐겨찾기에서 삭제했습니다.'),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final movie = findMovieById(movieId);
+    final movie = findMovieById(widget.movieId);
 
     if (movie == null) {
       return Scaffold(
@@ -19,7 +62,20 @@ class MovieDetailScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('영화 상세')),
+      appBar: AppBar(
+        title: const Text('영화 상세'),
+        actions: [
+          IconButton(
+            onPressed: _toggleFavorite,
+            tooltip: _isFavorite ? '즐겨찾기 삭제' : '즐겨찾기 추가',
+            icon: Icon(
+              _isFavorite
+                  ? Icons.bookmark_rounded
+                  : Icons.bookmark_border_rounded,
+            ),
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 32),
         children: [
@@ -42,8 +98,30 @@ class MovieDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${movie.genre} · ${movie.year} · ★ ${movie.averageRating}',
+                  '${movie.genre} · ${movie.year}',
                   style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    RatingBarIndicator(
+                      rating: movie.averageRating,
+                      itemCount: 5,
+                      itemSize: 22,
+                      unratedColor: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest,
+                      itemBuilder: (context, index) => Icon(
+                        Icons.star_rounded,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      movie.averageRating.toStringAsFixed(1),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 24),
                 Text('줄거리', style: Theme.of(context).textTheme.titleMedium),
@@ -52,6 +130,24 @@ class MovieDetailScreen extends StatelessWidget {
                   movie.synopsis,
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _openRatingDialog,
+                    icon: const Icon(Icons.star_outline_rounded),
+                    label: Text(_myRating == null ? '평점 남기기' : '평점 다시 선택하기'),
+                  ),
+                ),
+                if (_myRating != null) ...[
+                  const SizedBox(height: 12),
+                  Center(
+                    child: Text(
+                      '내 평점 ${_myRating!.toStringAsFixed(1)}점',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

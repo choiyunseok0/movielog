@@ -6,6 +6,7 @@ import 'package:movielog/router/app_router.dart';
 import 'package:movielog/screens/profile_screen.dart';
 import 'package:movielog/theme/app_theme.dart';
 import 'package:movielog/widgets/movie_card.dart';
+import 'package:movielog/widgets/movie_rating_input.dart';
 
 void main() {
   testWidgets('앱을 실행하면 시작 화면이 표시된다', (tester) async {
@@ -93,6 +94,48 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('내 프로필'), findsOneWidget);
 
+    AppRouter.router.go('/start');
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('영화 상세에서 즐겨찾기 결과를 표시한다', (tester) async {
+    await tester.pumpWidget(const MovieLogApp());
+    AppRouter.router.go('/movies/1');
+    await tester.pumpAndSettle();
+
+    expect(find.text('4.5'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('즐겨찾기 추가'));
+    await tester.pump();
+    expect(find.text('즐겨찾기에 추가했습니다.'), findsOneWidget);
+    expect(find.byTooltip('즐겨찾기 삭제'), findsOneWidget);
+
+    AppRouter.router.go('/start');
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('영화 상세에서 평점 Dialog를 표시한다', (tester) async {
+    await tester.pumpWidget(const MovieLogApp());
+    AppRouter.router.go('/movies/1');
+    await tester.pumpAndSettle();
+
+    expect(find.text('4.5'), findsOneWidget);
+
+    final ratingButton = find.widgetWithText(ElevatedButton, '평점 남기기');
+    await tester.ensureVisible(ratingButton);
+    await tester.pumpAndSettle();
+    await tester.tap(ratingButton);
+    await tester.pumpAndSettle();
+    expect(find.text('영화는 어떠셨나요?'), findsOneWidget);
+    expect(find.byType(MovieRatingInput), findsOneWidget);
+
+    final saveButton = tester.widget<ElevatedButton>(
+      find.widgetWithText(ElevatedButton, '저장'),
+    );
+    expect(saveButton.onPressed, isNull);
+
+    await tester.tapAt(const Offset(8, 8));
+    await tester.pumpAndSettle();
     AppRouter.router.go('/start');
     await tester.pumpAndSettle();
   });
