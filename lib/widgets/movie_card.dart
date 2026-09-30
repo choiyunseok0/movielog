@@ -3,10 +3,16 @@ import 'package:flutter/material.dart';
 import '../models/movie.dart';
 
 class MovieCard extends StatelessWidget {
-  const MovieCard({super.key, required this.movie, required this.onTap});
+  const MovieCard({
+    super.key,
+    required this.movie,
+    required this.onTap,
+    this.imageAspectRatio = 16 / 9,
+  });
 
   final Movie movie;
   final VoidCallback onTap;
+  final double imageAspectRatio;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +28,7 @@ class MovieCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AspectRatio(
-              aspectRatio: 16 / 9,
+              aspectRatio: imageAspectRatio,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(

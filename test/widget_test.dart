@@ -5,6 +5,7 @@ import 'package:movielog/data/mock_movies.dart';
 import 'package:movielog/router/app_router.dart';
 import 'package:movielog/screens/profile_screen.dart';
 import 'package:movielog/theme/app_theme.dart';
+import 'package:movielog/widgets/movie_card.dart';
 
 void main() {
   testWidgets('앱을 실행하면 시작 화면이 표시된다', (tester) async {
@@ -41,6 +42,25 @@ void main() {
     expect(find.text('영화 상세'), findsOneWidget);
     expect(find.text(featuredMovie.title), findsOneWidget);
     expect(find.textContaining(featuredMovie.genre), findsOneWidget);
+
+    AppRouter.router.go('/start');
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('영화 목록에서 선택한 장르의 영화만 표시된다', (tester) async {
+    await tester.pumpWidget(const MovieLogApp());
+    AppRouter.router.go('/movies');
+    await tester.pumpAndSettle();
+
+    expect(find.byType(GridView), findsOneWidget);
+    expect(find.text('별빛 아래 우리'), findsOneWidget);
+
+    await tester.tap(find.text('SF'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MovieCard), findsOneWidget);
+    expect(find.text('공허의 메아리'), findsOneWidget);
+    expect(find.text('별빛 아래 우리'), findsNothing);
 
     AppRouter.router.go('/start');
     await tester.pumpAndSettle();
