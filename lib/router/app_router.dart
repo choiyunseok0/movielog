@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../data/mock_movies.dart';
 import '../screens/home_screen.dart';
 import '../screens/main_screen.dart';
 import '../screens/movie_detail_screen.dart';
@@ -44,7 +45,13 @@ abstract final class AppRouter {
             routes: [
               GoRoute(
                 path: moviesPath,
-                builder: (context, state) => const MovieListScreen(),
+                builder: (context, state) {
+                  final genres = state.uri.queryParameters['genres']
+                      ?.split(',')
+                      .where(movieGenres.contains)
+                      .toSet();
+                  return MovieListScreen(selectedGenres: genres ?? const {});
+                },
               ),
             ],
           ),

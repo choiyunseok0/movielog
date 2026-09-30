@@ -1,5 +1,7 @@
 import '../models/movie.dart';
 
+const movieGenres = ['드라마', 'SF', '스릴러', '애니메이션'];
+
 const mockMovies = [
   Movie(
     id: 1,

@@ -102,12 +102,29 @@ void main() {
     expect(find.byType(GridView), findsOneWidget);
     expect(find.text('별빛 아래 우리'), findsOneWidget);
 
-    await tester.tap(find.text('SF'));
+    await tester.tap(find.byTooltip('장르 필터'));
+    await tester.pumpAndSettle();
+    expect(find.text('장르 필터'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('genre-SF')));
+    await tester.pump();
+    expect(find.text('별빛 아래 우리'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(ElevatedButton, '적용하기'));
     await tester.pumpAndSettle();
 
     expect(find.byType(MovieCard), findsOneWidget);
     expect(find.text('공허의 메아리'), findsOneWidget);
     expect(find.text('별빛 아래 우리'), findsNothing);
+    expect(
+      AppRouter
+          .router
+          .routeInformationProvider
+          .value
+          .uri
+          .queryParameters['genres'],
+      'SF',
+    );
 
     AppRouter.router.go('/start');
     await tester.pumpAndSettle();
@@ -115,11 +132,9 @@ void main() {
 
   testWidgets('NavigationBar 탭을 바꿔도 영화 장르 선택이 유지된다', (tester) async {
     await tester.pumpWidget(const MovieLogApp());
-    AppRouter.router.go('/movies');
+    AppRouter.router.go('/movies?genres=SF');
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('SF'));
-    await tester.pumpAndSettle();
     expect(find.text('공허의 메아리'), findsOneWidget);
 
     await tester.tap(find.text('홈'));
