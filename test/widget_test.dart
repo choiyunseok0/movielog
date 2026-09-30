@@ -13,6 +13,15 @@ void main() {
     expect(find.text('시작하기'), findsOneWidget);
   });
 
+  testWidgets('시작하기 버튼을 누르면 회원가입 화면으로 이동한다', (tester) async {
+    await tester.pumpWidget(const MovieLogApp());
+
+    await tester.tap(find.text('시작하기'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('회원가입'), findsWidgets);
+  });
+
   testWidgets('Figma 기준 프로필 정보가 표시된다', (tester) async {
     await tester.pumpWidget(
       MaterialApp(theme: AppTheme.light, home: const ProfileScreen()),
