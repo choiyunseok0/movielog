@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ProfileEditButton extends StatelessWidget {
   const ProfileEditButton({super.key});
@@ -10,11 +11,11 @@ class ProfileEditButton extends StatelessWidget {
 
     return Center(
       child: SizedBox(
-        width: 152,
+        width: 168,
         height: 52,
-        child: OutlinedButton(
+        child: TextButton.icon(
           onPressed: () {},
-          style: OutlinedButton.styleFrom(
+          style: TextButton.styleFrom(
             foregroundColor: colors.primary,
             side: BorderSide(color: colors.primary),
             shape: RoundedRectangleBorder(
@@ -22,7 +23,14 @@ class ProfileEditButton extends StatelessWidget {
             ),
             textStyle: textTheme.titleMedium,
           ),
-          child: const Text('프로필 수정'),
+          icon: SvgPicture.asset(
+            'assets/icons/person.svg',
+            width: 18,
+            height: 18,
+            colorFilter: ColorFilter.mode(colors.primary, BlendMode.srcIn),
+            semanticsLabel: '프로필 수정',
+          ),
+          label: const Text('프로필 수정'),
         ),
       ),
     );

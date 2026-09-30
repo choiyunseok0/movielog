@@ -13,6 +13,7 @@ class ProfileHeader extends StatelessWidget {
         Container(
           width: 148,
           height: 148,
+          margin: const EdgeInsets.only(bottom: 16),
           padding: const EdgeInsets.all(2),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
@@ -25,7 +26,6 @@ class ProfileHeader extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 16),
         Text(
           '무비러버',
           style: textTheme.titleLarge?.copyWith(
