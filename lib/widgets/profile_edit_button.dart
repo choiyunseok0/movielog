@@ -5,9 +5,26 @@ class ProfileEditButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(onPressed: () {}, child: const Text('프로필 수정')),
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Center(
+      child: SizedBox(
+        width: 152,
+        height: 52,
+        child: OutlinedButton(
+          onPressed: () {},
+          style: OutlinedButton.styleFrom(
+            foregroundColor: colors.primary,
+            side: BorderSide(color: colors.primary),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            textStyle: textTheme.titleMedium,
+          ),
+          child: const Text('프로필 수정'),
+        ),
+      ),
     );
   }
 }

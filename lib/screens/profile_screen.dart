@@ -25,17 +25,17 @@ class ProfileBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return const SafeArea(
       child: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        padding: EdgeInsets.fromLTRB(20, 32, 20, 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ProfileHeader(),
-            SizedBox(height: 32),
-            ProfileStats(),
-            SizedBox(height: 32),
-            FavoriteGenres(),
-            SizedBox(height: 32),
+            SizedBox(height: 24),
             ProfileEditButton(),
+            SizedBox(height: 40),
+            ProfileStats(),
+            SizedBox(height: 40),
+            FavoriteGenres(),
           ],
         ),
       ),

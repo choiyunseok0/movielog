@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({super.key});
@@ -11,32 +10,35 @@ class ProfileHeader extends StatelessWidget {
 
     return Column(
       children: [
-        CircleAvatar(
-          radius: 48,
-          backgroundColor: colors.surfaceContainer,
-          backgroundImage: const AssetImage(
-            'assets/images/profile/profile_movielog.jpg',
+        Container(
+          width: 148,
+          height: 148,
+          padding: const EdgeInsets.all(2),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: colors.primary, width: 2),
+          ),
+          child: ClipOval(
+            child: Image.asset(
+              'assets/images/profile/profile_movielog.jpg',
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              'assets/icons/person.svg',
-              width: 20,
-              height: 20,
-              colorFilter: ColorFilter.mode(colors.primary, BlendMode.srcIn),
-              semanticsLabel: '프로필',
-            ),
-            const SizedBox(width: 8),
-            Text('무비러버', style: textTheme.titleLarge),
-          ],
-        ),
-        const SizedBox(height: 8),
         Text(
-          '좋아하는 영화를 기록하고 있어요',
-          style: textTheme.bodyMedium?.copyWith(color: colors.outline),
+          '무비러버',
+          style: textTheme.titleLarge?.copyWith(
+            fontSize: 28,
+            height: 36 / 28,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          '매주 주말엔 영화관으로 출근하는 프로 관람객. 좋은\n영화를 보고 기록하는 것을 좋아합니다.',
+          textAlign: TextAlign.center,
+          style: textTheme.bodyLarge,
         ),
       ],
     );

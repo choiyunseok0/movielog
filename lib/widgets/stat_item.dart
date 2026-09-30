@@ -12,23 +12,26 @@ class StatItem extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+      height: 104,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
       decoration: BoxDecoration(
         color: colors.surface,
-        border: Border.all(color: colors.primary),
+        border: Border.all(color: colors.primaryContainer),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Text(label, textAlign: TextAlign.center, style: textTheme.bodyMedium),
+          const SizedBox(height: 10),
           Text(
             value,
             style: textTheme.titleLarge?.copyWith(
               color: colors.primary,
+              fontSize: 26,
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 4),
-          Text(label, textAlign: TextAlign.center, style: textTheme.bodyMedium),
         ],
       ),
     );

@@ -18,31 +18,34 @@ class StartScreen extends StatelessWidget {
             children: [
               Column(
                 children: [
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 48),
                   Text(
                     'FLUTTER 1주차',
-                    style: textTheme.labelLarge?.copyWith(
-                      color: colors.primary,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colors.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(height: 64),
+                  const SizedBox(height: 72),
                   SvgPicture.asset(
                     'assets/logos/movielog_logo.svg',
                     width: 72,
                     height: 72,
                     semanticsLabel: 'MovieLog 로고',
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 80),
                   Text(
                     '영화의 순간을\n기록하세요',
                     textAlign: TextAlign.center,
-                    style: textTheme.headlineSmall,
+                    style: textTheme.headlineSmall?.copyWith(
+                      fontSize: 32,
+                      height: 40 / 32,
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   Text(
                     '보고 싶은 영화부터 나만의 평점까지\n한곳에서 관리해요',
                     textAlign: TextAlign.center,
-                    style: textTheme.bodyMedium,
+                    style: textTheme.bodyLarge,
                   ),
                 ],
               ),
@@ -50,6 +53,13 @@ class StartScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(56),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    textStyle: textTheme.titleMedium,
+                  ),
                   child: const Text('시작하기'),
                 ),
               ),

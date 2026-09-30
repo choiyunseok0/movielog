@@ -13,8 +13,14 @@ class FavoriteGenres extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('선호 장르', style: textTheme.titleMedium),
-        const SizedBox(height: 12),
+        Text(
+          '선호하는 장르',
+          style: textTheme.titleMedium?.copyWith(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 16),
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -26,9 +32,8 @@ class FavoriteGenres extends StatelessWidget {
               ),
               backgroundColor: colors.primaryContainer,
               side: BorderSide.none,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
             );
           }).toList(),
         ),
