@@ -10,6 +10,7 @@ class MovieCard extends StatelessWidget {
     this.imageAspectRatio = 16 / 9,
     this.compact = false,
     this.showRating = false,
+    this.ratingOverlay = false,
     this.showMetadata = true,
     this.rank,
   });
@@ -19,6 +20,7 @@ class MovieCard extends StatelessWidget {
   final double imageAspectRatio;
   final bool compact;
   final bool showRating;
+  final bool ratingOverlay;
   final bool showMetadata;
   final int? rank;
 
@@ -72,6 +74,41 @@ class MovieCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                if (showRating && ratingOverlay)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.72),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 7,
+                          vertical: 4,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.star_rounded,
+                              size: 14,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 2),
+                            Text(
+                              movie.averageRating.toStringAsFixed(1),
+                              style: textTheme.labelSmall?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
             SizedBox(height: compact ? 8 : 12),
@@ -81,7 +118,7 @@ class MovieCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: compact ? textTheme.titleMedium : textTheme.titleLarge,
             ),
-            if (showRating) ...[
+            if (showRating && !ratingOverlay) ...[
               const SizedBox(height: 4),
               Row(
                 children: [

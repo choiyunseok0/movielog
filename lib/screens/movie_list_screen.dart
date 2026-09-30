@@ -67,7 +67,13 @@ class _MovieListScreenState extends State<MovieListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('영화'),
+        title: Text(
+          '영화',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: Theme.of(context).colorScheme.primary,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         actions: [
           IconButton(
             onPressed: _openGenreFilter,
@@ -78,6 +84,7 @@ class _MovieListScreenState extends State<MovieListScreen> {
               child: const Icon(Icons.filter_list_rounded),
             ),
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: SafeArea(
@@ -91,7 +98,7 @@ class _MovieListScreenState extends State<MovieListScreen> {
                   crossAxisCount: 2,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 24,
-                  childAspectRatio: 0.52,
+                  childAspectRatio: 0.5,
                 ),
                 itemBuilder: (context, index) {
                   final movie = filteredMovies[index];
@@ -100,6 +107,7 @@ class _MovieListScreenState extends State<MovieListScreen> {
                     imageAspectRatio: 0.65,
                     compact: true,
                     showRating: true,
+                    ratingOverlay: true,
                     onTap: () => context.push('/movies/${movie.id}'),
                   );
                 },
