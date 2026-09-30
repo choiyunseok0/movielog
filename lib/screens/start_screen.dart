@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 
 class StartScreen extends StatelessWidget {
   const StartScreen({super.key});
@@ -52,7 +53,7 @@ class StartScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () => context.go('/register'),
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size.fromHeight(56),
                     shape: RoundedRectangleBorder(
