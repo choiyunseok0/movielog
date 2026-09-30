@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../screens/home_screen.dart';
+import '../screens/main_screen.dart';
 import '../screens/movie_detail_screen.dart';
 import '../screens/movie_list_screen.dart';
 import '../screens/profile_screen.dart';
@@ -26,10 +27,36 @@ abstract final class AppRouter {
         path: registerPath,
         builder: (context, state) => const RegisterScreen(),
       ),
-      GoRoute(path: homePath, builder: (context, state) => const HomeScreen()),
-      GoRoute(
-        path: moviesPath,
-        builder: (context, state) => const MovieListScreen(),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return MainScreen(navigationShell: navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: homePath,
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: moviesPath,
+                builder: (context, state) => const MovieListScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: myPagePath,
+                builder: (context, state) => const ProfileScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
         path: '$moviesPath/:movieId',
@@ -44,10 +71,6 @@ abstract final class AppRouter {
 
           return MovieDetailScreen(movieId: movieId);
         },
-      ),
-      GoRoute(
-        path: myPagePath,
-        builder: (context, state) => const ProfileScreen(),
       ),
     ],
   );

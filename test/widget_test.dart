@@ -66,6 +66,37 @@ void main() {
     await tester.pumpAndSettle();
   });
 
+  testWidgets('NavigationBar 탭을 바꿔도 영화 장르 선택이 유지된다', (tester) async {
+    await tester.pumpWidget(const MovieLogApp());
+    AppRouter.router.go('/movies');
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('SF'));
+    await tester.pumpAndSettle();
+    expect(find.text('공허의 메아리'), findsOneWidget);
+
+    await tester.tap(find.text('홈'));
+    await tester.pumpAndSettle();
+    expect(find.text('오늘은 어떤 영화를 볼까요?'), findsOneWidget);
+
+    await tester.tap(find.text('영화'));
+    await tester.pumpAndSettle();
+    expect(find.text('공허의 메아리'), findsOneWidget);
+    expect(find.text('별빛 아래 우리'), findsNothing);
+
+    final navigationBar = tester.widget<NavigationBar>(
+      find.byType(NavigationBar),
+    );
+    expect(navigationBar.selectedIndex, 1);
+
+    await tester.tap(find.text('마이'));
+    await tester.pumpAndSettle();
+    expect(find.text('내 프로필'), findsOneWidget);
+
+    AppRouter.router.go('/start');
+    await tester.pumpAndSettle();
+  });
+
   testWidgets('Figma 기준 프로필 정보가 표시된다', (tester) async {
     await tester.pumpWidget(
       MaterialApp(theme: AppTheme.light, home: const ProfileScreen()),
