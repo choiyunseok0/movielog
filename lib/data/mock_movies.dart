@@ -1,6 +1,6 @@
 import '../models/movie.dart';
 
-const movieGenres = ['드라마', 'SF', '스릴러', '애니메이션'];
+const movieGenres = ['드라마', 'SF', '애니메이션', '스릴러', '로맨스', '코미디', '판타지', '다큐멘터리'];
 
 const mockMovies = [
   Movie(

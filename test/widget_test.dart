@@ -86,7 +86,7 @@ void main() {
     await tester.tap(find.text(featuredMovie.title));
     await tester.pumpAndSettle();
 
-    expect(find.text('영화 상세'), findsOneWidget);
+    expect(find.text('Cinema Archive'), findsOneWidget);
     await tester.drag(find.byType(ListView), const Offset(0, -600));
     await tester.pumpAndSettle();
     expect(find.text(featuredMovie.title), findsOneWidget);
@@ -117,7 +117,7 @@ void main() {
     await tester.pump();
     expect(find.text('별빛 아래 우리'), findsOneWidget);
 
-    await tester.tap(find.widgetWithText(ElevatedButton, '적용하기'));
+    await tester.tap(find.widgetWithText(ElevatedButton, '확인'));
     await tester.pumpAndSettle();
 
     expect(find.byType(MovieCard), findsOneWidget);
@@ -201,7 +201,7 @@ void main() {
     expect(find.byType(MovieRatingInput), findsOneWidget);
 
     final saveButton = tester.widget<ElevatedButton>(
-      find.widgetWithText(ElevatedButton, '저장'),
+      find.widgetWithText(ElevatedButton, '확인'),
     );
     expect(saveButton.onPressed, isNull);
 

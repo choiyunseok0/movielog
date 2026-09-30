@@ -24,7 +24,7 @@ class MovieRatingInput extends StatelessWidget {
         itemCount: 5,
         itemSize: 40,
         itemPadding: const EdgeInsets.symmetric(horizontal: 2),
-        unratedColor: colors.surfaceContainerHighest,
+        unratedColor: colors.primaryContainer,
         itemBuilder: (context, index) =>
             Icon(Icons.star_rounded, color: colors.primary),
         onRatingUpdate: onChanged,

@@ -38,24 +38,25 @@ class _GenreFilterSheetState extends State<GenreFilterSheet> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 12, 8),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
                         '장르 필터',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
-                    ),
-                    TextButton(
-                      onPressed: _selectedGenres.isEmpty
-                          ? null
-                          : () {
-                              setState(_selectedGenres.clear);
-                            },
-                      child: const Text('전체 해제'),
-                    ),
-                  ],
+                      const SizedBox(height: 4),
+                      Text(
+                        '여러 장르를 선택할 수 있어요',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               Expanded(
@@ -93,7 +94,7 @@ class _GenreFilterSheetState extends State<GenreFilterSheet> {
                       onPressed: () {
                         Navigator.of(context).pop({..._selectedGenres});
                       },
-                      child: const Text('적용하기'),
+                      child: const Text('확인'),
                     ),
                   ),
                 ),
