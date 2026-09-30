@@ -15,6 +15,7 @@ class MainScreen extends StatelessWidget {
         body: navigationShell,
         bottomNavigationBar: NavigationBar(
           selectedIndex: navigationShell.currentIndex,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
           onDestinationSelected: (index) {
             navigationShell.goBranch(
               index,
@@ -24,16 +25,19 @@ class MainScreen extends StatelessWidget {
           destinations: [
             _destination(
               context,
+              selected: navigationShell.currentIndex == 0,
               assetPath: 'assets/icons/home.svg',
               label: '홈',
             ),
             _destination(
               context,
+              selected: navigationShell.currentIndex == 1,
               assetPath: 'assets/icons/movie.svg',
               label: '영화',
             ),
             _destination(
               context,
+              selected: navigationShell.currentIndex == 2,
               assetPath: 'assets/icons/person.svg',
               label: '마이',
             ),
@@ -45,23 +49,43 @@ class MainScreen extends StatelessWidget {
 
   NavigationDestination _destination(
     BuildContext context, {
+    required bool selected,
     required String assetPath,
     required String label,
   }) {
     final colors = Theme.of(context).colorScheme;
 
     return NavigationDestination(
-      icon: SvgPicture.asset(
-        assetPath,
-        width: 24,
-        height: 24,
-        colorFilter: ColorFilter.mode(colors.onSurfaceVariant, BlendMode.srcIn),
-      ),
-      selectedIcon: SvgPicture.asset(
-        assetPath,
-        width: 24,
-        height: 24,
-        colorFilter: ColorFilter.mode(colors.primary, BlendMode.srcIn),
+      icon: AnimatedContainer(
+        key: ValueKey('navigation-$label'),
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+        decoration: BoxDecoration(
+          color: selected ? colors.primaryContainer : Colors.transparent,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SvgPicture.asset(
+              assetPath,
+              width: 22,
+              height: 22,
+              colorFilter: ColorFilter.mode(
+                selected ? colors.primary : colors.onSurfaceVariant,
+                BlendMode.srcIn,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: selected ? colors.primary : colors.onSurfaceVariant,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
       label: label,
     );

@@ -80,7 +80,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         padding: const EdgeInsets.only(bottom: 32),
         children: [
           AspectRatio(
-            aspectRatio: 16 / 9,
+            aspectRatio: 1.05,
             child: Image.asset(
               movie.posterAsset,
               fit: BoxFit.cover,
@@ -98,8 +98,10 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${movie.genre} · ${movie.year}',
-                  style: Theme.of(context).textTheme.bodyLarge,
+                  '${movie.year} · ${movie.genre} · ${movie.durationMinutes}분',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -121,14 +123,32 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                       movie.averageRating.toStringAsFixed(1),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '(1,245)',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   ],
                 ),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: movie.tags
+                      .map((tag) => Chip(label: Text(tag)))
+                      .toList(),
+                ),
                 const SizedBox(height: 24),
-                Text('줄거리', style: Theme.of(context).textTheme.titleMedium),
+                const Divider(),
+                const SizedBox(height: 20),
+                Text('시놉시스', style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 8),
                 Text(
                   movie.synopsis,
-                  style: Theme.of(context).textTheme.bodyLarge,
+                  style: Theme.of(context).textTheme.bodyLarge
+                      ?.copyWith(height: 1.65),
                 ),
                 const SizedBox(height: 32),
                 SizedBox(

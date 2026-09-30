@@ -87,8 +87,15 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('영화 상세'), findsOneWidget);
+    await tester.drag(find.byType(ListView), const Offset(0, -600));
+    await tester.pumpAndSettle();
     expect(find.text(featuredMovie.title), findsOneWidget);
-    expect(find.textContaining(featuredMovie.genre), findsOneWidget);
+    expect(
+      find.text(
+        '${featuredMovie.year} · ${featuredMovie.genre} · ${featuredMovie.durationMinutes}분',
+      ),
+      findsOneWidget,
+    );
 
     AppRouter.router.go('/start');
     await tester.pumpAndSettle();
@@ -137,11 +144,11 @@ void main() {
 
     expect(find.text('공허의 메아리'), findsOneWidget);
 
-    await tester.tap(find.text('홈'));
+    await tester.tap(find.byKey(const ValueKey('navigation-홈')));
     await tester.pumpAndSettle();
     expect(find.text('오늘은 어떤 영화를 볼까요?'), findsOneWidget);
 
-    await tester.tap(find.text('영화'));
+    await tester.tap(find.byKey(const ValueKey('navigation-영화')));
     await tester.pumpAndSettle();
     expect(find.text('공허의 메아리'), findsOneWidget);
     expect(find.text('별빛 아래 우리'), findsNothing);
@@ -151,7 +158,7 @@ void main() {
     );
     expect(navigationBar.selectedIndex, 1);
 
-    await tester.tap(find.text('마이'));
+    await tester.tap(find.byKey(const ValueKey('navigation-마이')));
     await tester.pumpAndSettle();
     expect(find.text('내 프로필'), findsOneWidget);
 
@@ -164,6 +171,8 @@ void main() {
     AppRouter.router.go('/movies/1');
     await tester.pumpAndSettle();
 
+    await tester.drag(find.byType(ListView), const Offset(0, -600));
+    await tester.pumpAndSettle();
     expect(find.text('4.5'), findsOneWidget);
 
     await tester.tap(find.byTooltip('즐겨찾기 추가'));
@@ -180,7 +189,8 @@ void main() {
     AppRouter.router.go('/movies/1');
     await tester.pumpAndSettle();
 
-    expect(find.text('4.5'), findsOneWidget);
+    await tester.drag(find.byType(ListView), const Offset(0, -800));
+    await tester.pumpAndSettle();
 
     final ratingButton = find.widgetWithText(ElevatedButton, '평점 남기기');
     await tester.ensureVisible(ratingButton);

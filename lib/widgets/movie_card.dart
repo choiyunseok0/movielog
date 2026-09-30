@@ -8,11 +8,19 @@ class MovieCard extends StatelessWidget {
     required this.movie,
     required this.onTap,
     this.imageAspectRatio = 16 / 9,
+    this.compact = false,
+    this.showRating = false,
+    this.showMetadata = true,
+    this.rank,
   });
 
   final Movie movie;
   final VoidCallback onTap;
   final double imageAspectRatio;
+  final bool compact;
+  final bool showRating;
+  final bool showMetadata;
+  final int? rank;
 
   @override
   Widget build(BuildContext context) {
@@ -27,26 +35,79 @@ class MovieCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AspectRatio(
-              aspectRatio: imageAspectRatio,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.asset(
-                  movie.posterAsset,
-                  fit: BoxFit.cover,
-                  semanticLabel: '${movie.title} 포스터',
+            Stack(
+              children: [
+                AspectRatio(
+                  aspectRatio: imageAspectRatio,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(compact ? 12 : 16),
+                    child: Image.asset(
+                      movie.posterAsset,
+                      fit: BoxFit.cover,
+                      semanticLabel: '${movie.title} 포스터',
+                    ),
+                  ),
+                ),
+                if (rank != null)
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.8),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 7,
+                          vertical: 4,
+                        ),
+                        child: Text(
+                          '$rank',
+                          style: textTheme.labelSmall?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            SizedBox(height: compact ? 8 : 12),
+            Text(
+              movie.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: compact ? textTheme.titleMedium : textTheme.titleLarge,
+            ),
+            if (showRating) ...[
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  const Icon(Icons.star_rounded, size: 14, color: Colors.amber),
+                  const SizedBox(width: 3),
+                  Text(
+                    movie.averageRating.toStringAsFixed(1),
+                    style: textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            if (showMetadata) ...[
+              const SizedBox(height: 4),
+              Text(
+                '${movie.year} · ${movie.genre}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.bodyMedium?.copyWith(
+                  fontSize: compact ? 12 : null,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            Text(movie.title, style: textTheme.titleLarge),
-            const SizedBox(height: 4),
-            Text(
-              '${movie.genre} · ${movie.year}',
-              style: textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
+            ],
           ],
         ),
       ),

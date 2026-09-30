@@ -97,7 +97,9 @@ class _MovieListScreenState extends State<MovieListScreen> {
                   final movie = filteredMovies[index];
                   return MovieCard(
                     movie: movie,
-                    imageAspectRatio: 2 / 3,
+                    imageAspectRatio: 0.65,
+                    compact: true,
+                    showRating: true,
                     onTap: () => context.push('/movies/${movie.id}'),
                   );
                 },

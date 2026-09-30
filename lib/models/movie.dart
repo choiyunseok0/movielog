@@ -6,6 +6,8 @@ class Movie {
     required this.year,
     required this.posterAsset,
     required this.averageRating,
+    required this.durationMinutes,
+    required this.tags,
     required this.synopsis,
   });
 
@@ -15,5 +17,7 @@ class Movie {
   final int year;
   final String posterAsset;
   final double averageRating;
+  final int durationMinutes;
+  final List<String> tags;
   final String synopsis;
 }
