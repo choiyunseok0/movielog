@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'screens/start_screen.dart';
+import 'screens/register_screen.dart';
 import 'theme/app_theme.dart';
 
 class MovieLogApp extends StatelessWidget {
@@ -12,7 +12,7 @@ class MovieLogApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'MovieLog',
       theme: AppTheme.light,
-      home: const StartScreen(),
+      home: const RegisterScreen(),
     );
   }
 }

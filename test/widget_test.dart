@@ -5,12 +5,12 @@ import 'package:movielog/screens/profile_screen.dart';
 import 'package:movielog/theme/app_theme.dart';
 
 void main() {
-  testWidgets('앱을 실행하면 시작 화면이 표시된다', (tester) async {
+  testWidgets('앱을 실행하면 2주차 회원가입 화면이 표시된다', (tester) async {
     await tester.pumpWidget(const MovieLogApp());
 
-    expect(find.text('FLUTTER 1주차'), findsOneWidget);
-    expect(find.text('영화의 순간을\n기록하세요'), findsOneWidget);
-    expect(find.text('시작하기'), findsOneWidget);
+    expect(find.text('회원가입'), findsOneWidget);
+    expect(find.text('MovieLog를 시작해 볼까요?'), findsOneWidget);
+    expect(find.byKey(const Key('nicknameField')), findsOneWidget);
   });
 
   testWidgets('Figma 기준 프로필 정보가 표시된다', (tester) async {
