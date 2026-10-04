@@ -3,6 +3,26 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:movielog/screens/register_screen.dart';
 
 void main() {
+  testWidgets('회원가입은 이전 화면이 있어도 시스템 뒤로가기를 차단한다', (tester) async {
+    final navigatorKey = GlobalKey<NavigatorState>();
+    await tester.pumpWidget(
+      MaterialApp(
+        navigatorKey: navigatorKey,
+        home: const Scaffold(body: Text('이전 화면')),
+      ),
+    );
+    navigatorKey.currentState!.push(
+      MaterialPageRoute<void>(builder: (_) => const RegisterScreen()),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(BackButton), findsNothing);
+    expect(find.byIcon(Icons.arrow_back), findsNothing);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.byType(RegisterScreen), findsOneWidget);
+    expect(find.text('이전 화면'), findsNothing);
+  });
+
   testWidgets('닉네임은 공백과 한 글자를 거부하고 두 글자 이상을 허용한다', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: RegisterScreen()));
     final field = find.byKey(const Key('nicknameField'));
