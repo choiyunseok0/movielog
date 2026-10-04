@@ -21,6 +21,45 @@ void main() {
     expect(find.text('사용할 닉네임: 리야'), findsOneWidget);
   });
 
+  testWidgets('모든 입력과 약관이 유효할 때만 가입할 수 있다', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: RegisterScreen()));
+    final button = find.byKey(const Key('registerButton'));
+    bool canSubmit() => tester.widget<ElevatedButton>(button).onPressed != null;
+    expect(canSubmit(), isFalse);
+
+    await tester.enterText(find.byKey(const Key('nicknameField')), '리야');
+    await tester.enterText(
+      find.byKey(const Key('emailField')),
+      'riya@example.com',
+    );
+    await tester.enterText(
+      find.byKey(const Key('passwordField')),
+      'password123',
+    );
+    await tester.pump();
+    expect(canSubmit(), isFalse);
+
+    final terms = find.byKey(const Key('termsCheckbox'));
+    await tester.ensureVisible(terms);
+    await tester.tap(terms);
+    await tester.pump();
+    expect(canSubmit(), isTrue);
+
+    await tester.ensureVisible(button);
+    await tester.tap(button);
+    await tester.pump();
+    expect(find.text('입력 확인이 완료되었습니다. 실제 회원가입은 연결하지 않습니다.'), findsOneWidget);
+
+    await tester.enterText(find.byKey(const Key('emailField')), 'bad@domain.');
+    await tester.pump();
+    expect(canSubmit(), isFalse);
+    expect(find.text('올바른 이메일 형식을 입력해 주세요.'), findsOneWidget);
+
+    await tester.enterText(find.byKey(const Key('passwordField')), '123');
+    await tester.pump();
+    expect(find.text('비밀번호는 8자 이상이어야 합니다.'), findsOneWidget);
+  });
+
   testWidgets('키보드가 화면을 가려도 입력 영역을 스크롤할 수 있다', (tester) async {
     tester.view.physicalSize = const Size(390, 500);
     tester.view.devicePixelRatio = 1;
