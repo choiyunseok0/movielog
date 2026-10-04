@@ -12,6 +12,7 @@ abstract final class AppTheme {
     onSurface: AppColors.onSurface,
     surfaceContainer: AppColors.surfaceContainer,
     outline: AppColors.outline,
+    outlineVariant: AppColors.outlineVariant,
     error: AppColors.error,
   );
 
@@ -41,9 +42,19 @@ abstract final class AppTheme {
       height: 20 / 14,
       fontWeight: FontWeight.w400,
     ),
+    bodySmall: TextStyle(
+      fontSize: 12,
+      height: 16 / 12,
+      fontWeight: FontWeight.w400,
+    ),
     labelLarge: TextStyle(
       fontSize: 14,
       height: 20 / 14,
+      fontWeight: FontWeight.w600,
+    ),
+    labelSmall: TextStyle(
+      fontSize: 11,
+      height: 16 / 11,
       fontWeight: FontWeight.w600,
     ),
   );
@@ -87,5 +98,42 @@ abstract final class AppTheme {
         textStyle: _textTheme.labelLarge,
       ),
     ),
+    navigationBarTheme: NavigationBarThemeData(
+      height: 72,
+      elevation: 0,
+      backgroundColor: AppColors.surface,
+      indicatorColor: Colors.transparent,
+      labelTextStyle: WidgetStatePropertyAll(_textTheme.labelSmall),
+    ),
+    chipTheme: const ChipThemeData(
+      backgroundColor: AppColors.surfaceContainer,
+      side: BorderSide.none,
+      shape: StadiumBorder(),
+      labelStyle: TextStyle(
+        color: AppColors.onSurface,
+        fontFamily: 'Manrope',
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+      ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: AppColors.surface,
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.outlineVariant),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.primary, width: 2),
+      ),
+    ),
+    dividerTheme: const DividerThemeData(
+      color: AppColors.outlineVariant,
+      thickness: 1,
+      space: 1,
+    ),
+    snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
   );
 }
