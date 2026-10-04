@@ -26,7 +26,8 @@ abstract final class AppRouter {
       ),
       GoRoute(
         path: registerPath,
-        builder: (context, state) => const RegisterScreen(),
+        builder: (context, state) =>
+            RegisterScreen(onRegistered: () => context.go(homePath)),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

@@ -9,65 +9,52 @@ import 'package:movielog/widgets/movie_card.dart';
 import 'package:movielog/widgets/movie_rating_input.dart';
 
 void main() {
+  setUp(() => AppRouter.router.go('/start'));
+
   testWidgets('앱을 실행하면 시작 화면이 표시된다', (tester) async {
     await tester.pumpWidget(const MovieLogApp());
-
+    await tester.pumpAndSettle();
     expect(find.text('FLUTTER 1주차'), findsOneWidget);
-    expect(find.text('영화의 순간을\n기록하세요'), findsOneWidget);
     expect(find.text('시작하기'), findsOneWidget);
   });
 
-  testWidgets('시작하기 버튼을 누르면 회원가입 화면으로 이동한다', (tester) async {
+  testWidgets('시작하기를 누르면 2주차 회원가입 화면이 열린다', (tester) async {
     await tester.pumpWidget(const MovieLogApp());
-
+    await tester.pumpAndSettle();
     await tester.tap(find.text('시작하기'));
     await tester.pumpAndSettle();
-
-    expect(find.text('회원가입'), findsWidgets);
+    expect(find.text('환영합니다!\n간단한 정보만 입력하고 시작해보세요.'), findsOneWidget);
   });
 
-  testWidgets('회원가입 검증이 완료되면 홈으로 이동하고 뒤로 가지 않는다', (tester) async {
+  testWidgets('입력과 약관 검증이 완료되면 홈으로 이동하고 뒤로 가지 않는다', (tester) async {
     await tester.pumpWidget(const MovieLogApp());
     AppRouter.router.go('/register');
     await tester.pumpAndSettle();
-
-    final initialRegisterButton = find.widgetWithText(ElevatedButton, '회원가입');
-    await tester.ensureVisible(initialRegisterButton);
-    await tester.tap(initialRegisterButton);
+    final button = find.byKey(const Key('registerButton'));
+    expect(tester.widget<ElevatedButton>(button).onPressed, isNull);
+    for (final entry in {
+      'nicknameField': '무비러버',
+      'emailField': 'movie@example.com',
+      'passwordField': 'password123',
+    }.entries) {
+      final field = find.byKey(Key(entry.key));
+      await tester.ensureVisible(field);
+      await tester.enterText(field, entry.value);
+    }
     await tester.pump();
-    expect(find.text('닉네임을 입력해 주세요.'), findsOneWidget);
-    expect(find.text('이메일을 입력해 주세요.'), findsOneWidget);
-
-    await tester.ensureVisible(find.byKey(const Key('nicknameField')));
-    await tester.enterText(find.byKey(const Key('nicknameField')), '무비러버');
-    await tester.ensureVisible(find.byKey(const Key('emailField')));
-    await tester.enterText(
-      find.byKey(const Key('emailField')),
-      'movie@example.com',
-    );
-    await tester.ensureVisible(find.byKey(const Key('passwordField')));
-    await tester.enterText(
-      find.byKey(const Key('passwordField')),
-      'password123',
-    );
-    await tester.ensureVisible(find.byKey(const Key('passwordConfirmField')));
-    await tester.enterText(
-      find.byKey(const Key('passwordConfirmField')),
-      'password123',
-    );
-
-    final registerButton = find.widgetWithText(ElevatedButton, '회원가입');
-    await tester.ensureVisible(registerButton);
-    await tester.tap(registerButton);
+    expect(tester.widget<ElevatedButton>(button).onPressed, isNull);
+    final terms = find.byKey(const Key('termsCheckbox'));
+    await tester.ensureVisible(terms);
+    await tester.tap(terms);
+    await tester.pump();
+    await tester.ensureVisible(button);
+    await tester.tap(button);
     await tester.pumpAndSettle();
-
     expect(find.text('오늘은 어떤 영화를 볼까요?'), findsOneWidget);
     expect(find.byType(NavigationBar), findsOneWidget);
-
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
     expect(find.text('오늘은 어떤 영화를 볼까요?'), findsOneWidget);
-
     AppRouter.router.go('/start');
     await tester.pumpAndSettle();
   });
