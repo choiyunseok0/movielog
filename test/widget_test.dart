@@ -9,7 +9,7 @@ void main() {
     await tester.pumpWidget(const MovieLogApp());
 
     expect(find.text('회원가입'), findsOneWidget);
-    expect(find.text('MovieLog를 시작해 볼까요?'), findsOneWidget);
+    expect(find.text('환영합니다!\n간단한 정보만 입력하고 시작해보세요.'), findsOneWidget);
     expect(find.byKey(const Key('nicknameField')), findsOneWidget);
   });
 

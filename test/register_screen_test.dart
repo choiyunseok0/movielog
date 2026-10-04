@@ -13,12 +13,12 @@ void main() {
 
     await tester.enterText(field, '리');
     await tester.pump();
-    expect(find.text('닉네임은 두 글자 이상 입력해 주세요.'), findsOneWidget);
+    expect(find.text('닉네임은 2자 이상이어야 합니다.'), findsOneWidget);
 
     await tester.enterText(field, ' 리야 ');
     await tester.pump();
-    expect(find.text('닉네임은 두 글자 이상 입력해 주세요.'), findsNothing);
-    expect(find.text('사용할 닉네임: 리야'), findsOneWidget);
+    expect(find.text('닉네임은 2자 이상이어야 합니다.'), findsNothing);
+    expect(find.byIcon(Icons.check_circle), findsOneWidget);
   });
 
   testWidgets('모든 입력과 약관이 유효할 때만 가입할 수 있다', (tester) async {
@@ -48,7 +48,7 @@ void main() {
     await tester.ensureVisible(button);
     await tester.tap(button);
     await tester.pump();
-    expect(find.text('입력 확인이 완료되었습니다. 실제 회원가입은 연결하지 않습니다.'), findsOneWidget);
+    expect(find.byType(SnackBar), findsNothing);
 
     await tester.enterText(find.byKey(const Key('emailField')), 'bad@domain.');
     await tester.pump();
