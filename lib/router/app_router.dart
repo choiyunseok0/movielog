@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../data/services/tmdb_movie_service.dart';
 import '../view_models/movie_home_view_model.dart';
 
-import '../data/mock_movies.dart';
+import '../view_models/movie_list_view_model.dart';
 import '../screens/home_screen.dart';
 import '../screens/main_screen.dart';
 import '../screens/movie_detail_screen.dart';
@@ -56,11 +56,21 @@ abstract final class AppRouter {
               GoRoute(
                 path: moviesPath,
                 builder: (context, state) {
-                  final genres = state.uri.queryParameters['genres']
-                      ?.split(',')
-                      .where(movieGenres.contains)
-                      .toSet();
-                  return MovieListScreen(selectedGenres: genres ?? const {});
+                  final genres =
+                      state.uri.queryParameters['genres']
+                          ?.split(',')
+                          .map(int.tryParse)
+                          .whereType<int>()
+                          .where((id) => id > 0)
+                          .toSet()
+                          .toList() ??
+                      const <int>[];
+                  return ChangeNotifierProvider(
+                    create: (context) =>
+                        MovieListViewModel(context.read<TmdbMovieService>())
+                          ..load(genreIds: genres),
+                    child: MovieListScreen(selectedGenres: genres),
+                  );
                 },
               ),
             ],

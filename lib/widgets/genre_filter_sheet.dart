@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 
-import '../data/mock_movies.dart';
+import '../data/models/tmdb_genre_dto.dart';
 
 class GenreFilterSheet extends StatefulWidget {
-  const GenreFilterSheet({super.key, required this.initialGenres});
+  const GenreFilterSheet({
+    super.key,
+    required this.initialGenres,
+    required this.genres,
+  });
 
-  final Set<String> initialGenres;
+  final List<int> initialGenres;
+  final List<TmdbGenreDto> genres;
 
   @override
   State<GenreFilterSheet> createState() => _GenreFilterSheetState();
 }
 
 class _GenreFilterSheetState extends State<GenreFilterSheet> {
-  late final Set<String> _selectedGenres = {...widget.initialGenres};
+  late final Set<int> _selectedGenres = {...widget.initialGenres};
 
   @override
   Widget build(BuildContext context) {
@@ -63,20 +68,20 @@ class _GenreFilterSheetState extends State<GenreFilterSheet> {
                 child: ListView.builder(
                   controller: scrollController,
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  itemCount: movieGenres.length,
+                  itemCount: widget.genres.length,
                   itemBuilder: (context, index) {
-                    final genre = movieGenres[index];
+                    final genre = widget.genres[index];
                     return CheckboxListTile(
-                      key: ValueKey('genre-$genre'),
-                      value: _selectedGenres.contains(genre),
-                      title: Text(genre),
+                      key: ValueKey('genre-${genre.id}'),
+                      value: _selectedGenres.contains(genre.id),
+                      title: Text(genre.name),
                       controlAffinity: ListTileControlAffinity.leading,
                       onChanged: (selected) {
                         setState(() {
                           if (selected ?? false) {
-                            _selectedGenres.add(genre);
+                            _selectedGenres.add(genre.id);
                           } else {
-                            _selectedGenres.remove(genre);
+                            _selectedGenres.remove(genre.id);
                           }
                         });
                       },
@@ -92,7 +97,12 @@ class _GenreFilterSheetState extends State<GenreFilterSheet> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.of(context).pop({..._selectedGenres});
+                        Navigator.of(context).pop(
+                          widget.genres
+                              .where((g) => _selectedGenres.contains(g.id))
+                              .map((g) => g.id)
+                              .toList(),
+                        );
                       },
                       child: const Text('확인'),
                     ),
