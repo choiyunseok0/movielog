@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  const RegisterScreen({super.key, this.onRegistered});
+
+  final VoidCallback? onRegistered;
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -49,6 +51,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final isValid = _formKey.currentState?.validate() ?? false;
     if (!isValid || !_agreedToTerms) return;
     FocusScope.of(context).unfocus();
+    widget.onRegistered?.call();
   }
 
   Widget _input({
@@ -139,133 +142,136 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          '회원가입',
-          style: Theme.of(context).textTheme.titleLarge
-              ?.copyWith(color: AppColors.primary, fontSize: 20),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text(
+            '회원가입',
+            style: Theme.of(context).textTheme.titleLarge
+                ?.copyWith(color: AppColors.primary, fontSize: 20),
+          ),
+          automaticallyImplyLeading: false,
+          scrolledUnderElevation: 0,
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, size: 22),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-        scrolledUnderElevation: 0,
-      ),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) => SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: (constraints.maxHeight - 48).clamp(
-                  0,
-                  double.infinity,
+        body: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: (constraints.maxHeight - 48).clamp(
+                    0,
+                    double.infinity,
+                  ),
                 ),
-              ),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const _RegisterHeader(),
-                        const SizedBox(height: 48),
-                        _input(
-                          label: '닉네임',
-                          hint: '닉네임을 입력해주세요',
-                          fieldKey: 'nicknameField',
-                          controller: _nicknameController,
-                          focusNode: _nicknameFocusNode,
-                          validator: (value) {
-                            final nickname = value?.trim() ?? '';
-                            if (nickname.isEmpty) return '닉네임을 입력해 주세요.';
-                            if (nickname.length < 2) {
-                              return '닉네임은 2자 이상이어야 합니다.';
-                            }
-                            return null;
-                          },
-                          onSubmitted: () => _emailFocusNode.requestFocus(),
-                        ),
-                        const SizedBox(height: 16),
-                        _input(
-                          label: '이메일',
-                          hint: '이메일 주소를 입력해주세요',
-                          fieldKey: 'emailField',
-                          controller: _emailController,
-                          focusNode: _emailFocusNode,
-                          validator: _validateEmail,
-                          isEmail: true,
-                          onSubmitted: () => _passwordFocusNode.requestFocus(),
-                        ),
-                        const SizedBox(height: 16),
-                        _input(
-                          label: '비밀번호',
-                          hint: '비밀번호를 입력해주세요',
-                          fieldKey: 'passwordField',
-                          controller: _passwordController,
-                          focusNode: _passwordFocusNode,
-                          isPassword: true,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return '비밀번호를 입력해 주세요.';
-                            }
-                            if (value.length < 8) return '비밀번호는 8자 이상이어야 합니다.';
-                            return null;
-                          },
-                          onSubmitted: () {
-                            if (_canSubmit) {
-                              _submit();
-                            } else {
-                              _passwordFocusNode.unfocus();
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 48),
-                      child: Column(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          _TermsAgreement(
-                            value: _agreedToTerms,
-                            onChanged: (value) =>
-                                setState(() => _agreedToTerms = value),
+                          const _RegisterHeader(),
+                          const SizedBox(height: 48),
+                          _input(
+                            label: '닉네임',
+                            hint: '닉네임을 입력해주세요',
+                            fieldKey: 'nicknameField',
+                            controller: _nicknameController,
+                            focusNode: _nicknameFocusNode,
+                            validator: (value) {
+                              final nickname = value?.trim() ?? '';
+                              if (nickname.isEmpty) return '닉네임을 입력해 주세요.';
+                              if (nickname.length < 2) {
+                                return '닉네임은 2자 이상이어야 합니다.';
+                              }
+                              return null;
+                            },
+                            onSubmitted: () => _emailFocusNode.requestFocus(),
                           ),
                           const SizedBox(height: 16),
-                          ElevatedButton(
-                            key: const Key('registerButton'),
-                            onPressed: _canSubmit ? _submit : null,
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size.fromHeight(56),
-                              elevation: 0,
-                              disabledBackgroundColor:
-                                  AppColors.disabledPrimary,
-                              disabledForegroundColor: AppColors.onPrimary,
-                            ),
-                            child: const Text('가입하기'),
+                          _input(
+                            label: '이메일',
+                            hint: '이메일 주소를 입력해주세요',
+                            fieldKey: 'emailField',
+                            controller: _emailController,
+                            focusNode: _emailFocusNode,
+                            validator: _validateEmail,
+                            isEmail: true,
+                            onSubmitted: () =>
+                                _passwordFocusNode.requestFocus(),
                           ),
-                          const SizedBox(height: 24),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text('이미 계정이 있나요?'),
-                              TextButton(
-                                onPressed: () {},
-                                child: const Text('로그인'),
-                              ),
-                            ],
+                          const SizedBox(height: 16),
+                          _input(
+                            label: '비밀번호',
+                            hint: '비밀번호를 입력해주세요',
+                            fieldKey: 'passwordField',
+                            controller: _passwordController,
+                            focusNode: _passwordFocusNode,
+                            isPassword: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return '비밀번호를 입력해 주세요.';
+                              }
+                              if (value.length < 8) {
+                                return '비밀번호는 8자 이상이어야 합니다.';
+                              }
+                              return null;
+                            },
+                            onSubmitted: () {
+                              if (_canSubmit) {
+                                _submit();
+                              } else {
+                                _passwordFocusNode.unfocus();
+                              }
+                            },
                           ),
                         ],
                       ),
-                    ),
-                  ],
+                      Padding(
+                        padding: const EdgeInsets.only(top: 48),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _TermsAgreement(
+                              value: _agreedToTerms,
+                              onChanged: (value) =>
+                                  setState(() => _agreedToTerms = value),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              key: const Key('registerButton'),
+                              onPressed: _canSubmit ? _submit : null,
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: const Size.fromHeight(56),
+                                elevation: 0,
+                                disabledBackgroundColor:
+                                    AppColors.disabledPrimary,
+                                disabledForegroundColor: AppColors.onPrimary,
+                              ),
+                              child: const Text('가입하기'),
+                            ),
+                            const SizedBox(height: 24),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text('이미 계정이 있나요?'),
+                                TextButton(
+                                  onPressed: () {},
+                                  child: const Text('로그인'),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
