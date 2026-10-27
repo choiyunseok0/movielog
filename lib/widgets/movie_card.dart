@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../models/movie.dart';
+import '../data/models/tmdb_movie_dto.dart';
+import 'movie_poster.dart';
 
 class MovieCard extends StatelessWidget {
   const MovieCard({
@@ -13,9 +15,23 @@ class MovieCard extends StatelessWidget {
     this.ratingOverlay = false,
     this.showMetadata = true,
     this.rank,
-  });
+  }) : tmdbMovie = null;
 
-  final Movie movie;
+  const MovieCard.tmdb({
+    super.key,
+    required TmdbMovieDto movie,
+    required this.onTap,
+    this.imageAspectRatio = 16 / 9,
+    this.compact = false,
+    this.showRating = false,
+    this.ratingOverlay = false,
+    this.showMetadata = true,
+    this.rank,
+  }) : tmdbMovie = movie,
+       movie = null;
+
+  final Movie? movie;
+  final TmdbMovieDto? tmdbMovie;
   final VoidCallback onTap;
   final double imageAspectRatio;
   final bool compact;
@@ -27,10 +43,15 @@ class MovieCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final title = tmdbMovie?.title ?? movie!.title;
+    final rating = tmdbMovie?.voteAverage ?? movie!.averageRating;
+    final metadata = tmdbMovie != null
+        ? tmdbMovie!.releaseDate
+        : '${movie!.year} · ${movie!.genre}';
 
     return Semantics(
       button: true,
-      label: '${movie.title} 상세 보기',
+      label: '$title 상세 보기',
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
@@ -43,11 +64,13 @@ class MovieCard extends StatelessWidget {
                   aspectRatio: imageAspectRatio,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(compact ? 12 : 16),
-                    child: Image.asset(
-                      movie.posterAsset,
-                      fit: BoxFit.cover,
-                      semanticLabel: '${movie.title} 포스터',
-                    ),
+                    child: tmdbMovie != null
+                        ? MoviePoster(url: tmdbMovie!.posterUrl, title: title)
+                        : Image.asset(
+                            movie!.posterAsset,
+                            fit: BoxFit.cover,
+                            semanticLabel: '$title 포스터',
+                          ),
                   ),
                 ),
                 if (rank != null)
@@ -98,7 +121,7 @@ class MovieCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 2),
                             Text(
-                              movie.averageRating.toStringAsFixed(1),
+                              rating.toStringAsFixed(1),
                               style: textTheme.labelSmall?.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w700,
@@ -113,7 +136,7 @@ class MovieCard extends StatelessWidget {
             ),
             SizedBox(height: compact ? 8 : 12),
             Text(
-              movie.title,
+              title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: compact ? textTheme.titleMedium : textTheme.titleLarge,
@@ -125,7 +148,7 @@ class MovieCard extends StatelessWidget {
                   const Icon(Icons.star_rounded, size: 14, color: Colors.amber),
                   const SizedBox(width: 3),
                   Text(
-                    movie.averageRating.toStringAsFixed(1),
+                    rating.toStringAsFixed(1),
                     style: textTheme.bodySmall?.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -136,7 +159,7 @@ class MovieCard extends StatelessWidget {
             if (showMetadata) ...[
               const SizedBox(height: 4),
               Text(
-                '${movie.year} · ${movie.genre}',
+                metadata,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: textTheme.bodyMedium?.copyWith(
