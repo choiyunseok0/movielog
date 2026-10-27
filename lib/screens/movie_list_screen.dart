@@ -18,13 +18,15 @@ class MovieListScreen extends StatefulWidget {
 
 class _MovieListScreenState extends State<MovieListScreen> {
   bool _errorDialogOpen = false;
+  bool _errorHandled = false;
 
   void _checkError(MovieListViewModel vm) {
-    if (vm.status != MovieListLoadStatus.error ||
-        vm.movies.isEmpty ||
-        _errorDialogOpen) {
+    if (vm.status != MovieListLoadStatus.error) {
+      _errorHandled = false;
       return;
     }
+    if (_errorDialogOpen || _errorHandled) return;
+    _errorHandled = true;
     _errorDialogOpen = true;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted || vm.status != MovieListLoadStatus.error) {
@@ -35,25 +37,104 @@ class _MovieListScreenState extends State<MovieListScreen> {
         context: context,
         barrierDismissible: false,
         builder: (context) => AlertDialog(
-          icon: const Icon(Icons.restart_alt_rounded, size: 40),
-          title: const Text('영화를 불러오지 못했어요'),
-          content: const Text('네트워크 상태를 확인하고\n다시 시도해 주세요.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('취소'),
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+          ),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 24,
+            vertical: 24,
+          ),
+          contentPadding: const EdgeInsets.fromLTRB(24, 28, 24, 28),
+          content: SizedBox(
+            width: 320,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF0EAF9),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.restart_alt_rounded,
+                    size: 40,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  '영화를 불러오지 못했어요',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 21,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF29272D),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  '네트워크 상태를 확인하고\n다시 시도해 주세요.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.6,
+                    color: Color(0xFF746E7D),
+                  ),
+                ),
+                const SizedBox(height: 36),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          backgroundColor: const Color(0xFFF5EFFB),
+                          foregroundColor: Theme.of(context)
+                              .colorScheme
+                              .primary,
+                          minimumSize: const Size(0, 56),
+                          shape: const StadiumBorder(),
+                          textStyle: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('취소'),
+                      ),
+                    ),
+                    const SizedBox(width: 24),
+                    Expanded(
+                      child: FilledButton(
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size(0, 56),
+                          shape: const StadiumBorder(),
+                          textStyle: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('다시 시도'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('다시 시도'),
-            ),
-          ],
+          ),
         ),
       );
       _errorDialogOpen = false;
       if (!mounted) return;
       vm.dismissError();
-      if (retry == true) vm.refresh();
+      if (retry == true) {
+        _errorHandled = false;
+        vm.refresh();
+      }
     });
   }
 
@@ -147,7 +228,10 @@ class _MovieListScreenState extends State<MovieListScreen> {
             children: [
               Text(vm.message!),
               TextButton(
-                onPressed: () => vm.load(),
+                onPressed: () {
+                  _errorHandled = false;
+                  vm.load();
+                },
                 child: const Text('다시 시도'),
               ),
             ],

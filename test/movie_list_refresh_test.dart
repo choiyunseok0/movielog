@@ -100,6 +100,35 @@ void main() {
     vm.dispose();
   });
 
+  testWidgets('첫 로딩 실패도 팝업을 표시하고 취소 후 반복하지 않는다', (tester) async {
+    final service = _Service()..fail = true;
+    final vm = MovieListViewModel(service);
+    await vm.load();
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: vm,
+        child: const MaterialApp(home: MovieListScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    await tester.tap(find.text('취소'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    await tester.pump();
+    expect(find.byType(AlertDialog), findsNothing);
+    await tester.tap(find.text('다시 시도'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    service.fail = false;
+    await tester.tap(find.widgetWithText(FilledButton, '다시 시도'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.byType(GridView), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+    vm.dispose();
+  });
+
   testWidgets('당겨 새로고침 실패 시 목록 유지, 취소와 재시도 동작', (tester) async {
     final service = _Service();
     final vm = MovieListViewModel(service);
