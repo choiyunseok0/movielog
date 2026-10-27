@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../data/services/tmdb_movie_service.dart';
+import '../data/models/tmdb_movie_dto.dart';
 import '../view_models/movie_home_view_model.dart';
 
 import '../view_models/movie_list_view_model.dart';
@@ -96,7 +97,15 @@ abstract final class AppRouter {
             );
           }
 
-          return MovieDetailScreen(movieId: movieId);
+          final movie = state.extra is TmdbMovieDto
+              ? state.extra as TmdbMovieDto
+              : null;
+          if (movie != null && movie.id != movieId) {
+            return const Scaffold(
+              body: Center(child: Text('영화 정보를 찾을 수 없습니다.')),
+            );
+          }
+          return MovieDetailScreen(movieId: movieId, tmdbMovie: movie);
         },
       ),
     ],

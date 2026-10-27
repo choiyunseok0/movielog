@@ -125,7 +125,7 @@ class _MovieListScreenState extends State<MovieListScreen> {
               compact: true,
               showRating: true,
               ratingOverlay: true,
-              onTap: () => context.push('/movies/${movie.id}'),
+              onTap: () => context.push('/movies/${movie.id}', extra: movie),
             );
           },
         );

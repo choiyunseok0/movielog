@@ -109,7 +109,10 @@ class HomeScreen extends StatelessWidget {
                               showRating: true,
                               showMetadata: false,
                               rank: index + 1,
-                              onTap: () => context.push('/movies/${movie.id}'),
+                              onTap: () => context.push(
+                                '/movies/${movie.id}',
+                                extra: movie,
+                              ),
                             ),
                           );
                         },

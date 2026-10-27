@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:movielog/screens/movie_detail_screen.dart';
+import 'package:movielog/widgets/rating_dialog.dart';
+import 'package:movielog/widgets/movie_poster.dart';
 import 'package:provider/provider.dart';
 import 'package:movielog/data/models/tmdb_movie_dto.dart';
 import 'package:movielog/data/models/tmdb_genre_dto.dart';
@@ -207,6 +211,61 @@ void main() {
     await tester.pumpAndSettle();
   });
 
+  for (final location in ['/home', '/movies']) {
+    testWidgets('$location 실제 영화 ID가 상세와 평점까지 전달된다', (tester) async {
+      await tester.pumpWidget(_testApp());
+      AppRouter.router.go(location);
+      await tester.pumpAndSettle();
+      if (location == '/home') {
+        await tester.drag(find.byType(ListView).first, const Offset(0, -650));
+        await tester.pumpAndSettle();
+      }
+      final card = find
+          .byWidgetPredicate(
+            (widget) => widget is MovieCard && widget.tmdbMovie != null,
+          )
+          .first;
+      final movie = tester.widget<MovieCard>(card).tmdbMovie!;
+      await tester.ensureVisible(card);
+      await tester.pumpAndSettle();
+      await tester.tap(card);
+      await tester.pumpAndSettle();
+      final detail = tester.widget<MovieDetailScreen>(
+        find.byType(MovieDetailScreen),
+      );
+      expect(detail.movieId, movie.id);
+      expect(detail.tmdbMovie, same(movie));
+      expect(find.byType(MoviePoster), findsOneWidget);
+      await tester.drag(find.byType(ListView), const Offset(0, -650));
+      await tester.pumpAndSettle();
+      expect(find.text('8.4 / 10'), findsOneWidget);
+      expect(
+        tester
+            .widget<RatingBarIndicator>(find.byType(RatingBarIndicator))
+            .rating,
+        4.2,
+      );
+      expect(find.text('(1,245)'), findsNothing);
+      await tester.tap(find.widgetWithText(ElevatedButton, '평점 남기기'));
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<RatingDialog>(find.byType(RatingDialog)).movieId,
+        movie.id,
+      );
+      tester
+          .widget<MovieRatingInput>(find.byType(MovieRatingInput))
+          .onChanged(4.0);
+      await tester.pump();
+      await tester.tap(find.widgetWithText(ElevatedButton, '확인'));
+      await tester.pumpAndSettle();
+      await tester.drag(find.byType(ListView), const Offset(0, -600));
+      await tester.pumpAndSettle();
+      expect(find.text('내 평점 4.0점'), findsOneWidget);
+      AppRouter.router.go('/start');
+      await tester.pumpAndSettle();
+    });
+  }
+
   testWidgets('Figma 기준 프로필 정보가 표시된다', (tester) async {
     await tester.pumpWidget(
       MaterialApp(theme: AppTheme.light, home: const ProfileScreen()),
@@ -261,9 +320,11 @@ class _TestMovieService extends TmdbMovieService {
     final results = movies
         .map(
           (movie) => TmdbMovieDto.fromJson({
-            'id': movie.id,
+            'id': movie.id + 10000,
             'title': movie.title,
-            'vote_average': movie.averageRating,
+            'vote_average': 8.4,
+            'overview': 'TMDB 테스트 줄거리',
+            'release_date': '2026-10-27',
           }),
         )
         .toList();
