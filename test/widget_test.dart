@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:movielog/app.dart';
 import 'package:movielog/data/mock_movies.dart';
@@ -9,7 +10,10 @@ import 'package:movielog/widgets/movie_card.dart';
 import 'package:movielog/widgets/movie_rating_input.dart';
 
 void main() {
-  setUp(() => AppRouter.router.go('/start'));
+  setUp(() {
+    dotenv.loadFromString(envString: 'TMDB_ACCESS_TOKEN=');
+    AppRouter.router.go('/start');
+  });
 
   testWidgets('앱을 실행하면 시작 화면이 표시된다', (tester) async {
     await tester.pumpWidget(const MovieLogApp());

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+import '../view_models/movie_home_view_model.dart';
 
 import '../data/mock_movies.dart';
 import '../widgets/featured_movie_card.dart';
@@ -11,7 +14,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final featuredMovie = mockMovies.first;
-    final recommendedMovies = mockMovies.skip(1).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -70,25 +72,49 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 12),
             SizedBox(
               height: 270,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                scrollDirection: Axis.horizontal,
-                itemCount: recommendedMovies.length,
-                separatorBuilder: (context, index) => const SizedBox(width: 12),
-                itemBuilder: (context, index) {
-                  final movie = recommendedMovies[index];
-                  return SizedBox(
-                    width: 140,
-                    child: MovieCard(
-                      movie: movie,
-                      imageAspectRatio: 0.68,
-                      compact: true,
-                      showRating: true,
-                      showMetadata: false,
-                      rank: index + 1,
-                      onTap: () => context.push('/movies/${movie.id}'),
-                    ),
-                  );
+              child: Consumer<MovieHomeViewModel>(
+                builder: (context, viewModel, child) {
+                  switch (viewModel.status) {
+                    case MovieHomeLoadStatus.idle:
+                    case MovieHomeLoadStatus.loading:
+                      return const Center(child: CircularProgressIndicator());
+                    case MovieHomeLoadStatus.error:
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(viewModel.message!),
+                          TextButton(
+                            onPressed: viewModel.loadPopular,
+                            child: const Text('다시 시도'),
+                          ),
+                        ],
+                      );
+                    case MovieHomeLoadStatus.empty:
+                      return const Center(child: Text('인기 영화가 없습니다.'));
+                    case MovieHomeLoadStatus.success:
+                      return ListView.separated(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: viewModel.popularMovies.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(width: 12),
+                        itemBuilder: (context, index) {
+                          final movie = viewModel.popularMovies[index];
+                          return SizedBox(
+                            width: 140,
+                            child: MovieCard.tmdb(
+                              movie: movie,
+                              imageAspectRatio: 0.68,
+                              compact: true,
+                              showRating: true,
+                              showMetadata: false,
+                              rank: index + 1,
+                              onTap: () => context.push('/movies/${movie.id}'),
+                            ),
+                          );
+                        },
+                      );
+                  }
                 },
               ),
             ),

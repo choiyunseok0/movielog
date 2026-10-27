@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+import '../data/services/tmdb_movie_service.dart';
+import '../view_models/movie_home_view_model.dart';
 
 import '../data/mock_movies.dart';
 import '../screens/home_screen.dart';
@@ -38,7 +42,12 @@ abstract final class AppRouter {
             routes: [
               GoRoute(
                 path: homePath,
-                builder: (context, state) => const HomeScreen(),
+                builder: (context, state) => ChangeNotifierProvider(
+                  create: (context) =>
+                      MovieHomeViewModel(context.read<TmdbMovieService>())
+                        ..loadPopular(),
+                  child: const HomeScreen(),
+                ),
               ),
             ],
           ),
