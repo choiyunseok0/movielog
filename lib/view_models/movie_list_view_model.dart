@@ -15,6 +15,7 @@ class MovieListViewModel extends ChangeNotifier {
   List<int> selectedGenreIds = const [];
   MovieListLoadStatus status = MovieListLoadStatus.idle;
   String? message;
+  bool isRefreshing = false;
   int _requestVersion = 0;
   bool _disposed = false;
 
@@ -42,13 +43,13 @@ class MovieListViewModel extends ChangeNotifier {
     return byId.values.toList();
   }
 
-  Future<void> load({List<int>? genreIds}) async {
+  Future<void> load({List<int>? genreIds, bool keepMovies = false}) async {
     if (_disposed) return;
     final version = ++_requestVersion;
     selectedGenreIds = List.of(genreIds ?? selectedGenreIds);
     final requestedGenres = List<int>.of(selectedGenreIds);
+    isRefreshing = keepMovies;
     status = MovieListLoadStatus.loading;
-    movies = const [];
     message = null;
     notifyListeners();
     try {
@@ -68,6 +69,19 @@ class MovieListViewModel extends ChangeNotifier {
       status = MovieListLoadStatus.error;
       message = '영화를 불러오지 못했어요. 다시 시도해 주세요.';
     }
+    isRefreshing = false;
+    notifyListeners();
+  }
+
+  Future<void> refresh() async {
+    if (isLoading || _disposed) return;
+    await load(keepMovies: true);
+  }
+
+  void dismissError() {
+    if (_disposed || movies.isEmpty) return;
+    message = null;
+    status = MovieListLoadStatus.success;
     notifyListeners();
   }
 
