@@ -41,11 +41,14 @@ abstract final class AppRouter {
         branches: [
           StatefulShellBranch(
             routes: [
+              // 2. app_route.dart. : ViewModel 생성 & 첫 요청 시작 (3.movie_home_view_model.dart)
               GoRoute(
                 path: homePath,
                 builder: (context, state) => ChangeNotifierProvider(
                   create: (context) =>
+                      // 공통 Service를 가져와 홈 ViewModel에 전달한다
                       MovieHomeViewModel(context.read<TmdbMovieService>())
+                        // 생성한 ViewModel에서 첫 요청 시작 (인기영화 5개)
                         ..loadPopular(),
                   child: const HomeScreen(),
                 ),

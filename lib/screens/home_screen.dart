@@ -72,10 +72,14 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 12),
             SizedBox(
               height: 270,
+
+              // 7. home_screen.dart — ⑤ 영화 카드 표시 (8. movie_card(poster).dart)
               child: Consumer<MovieHomeViewModel>(
+                // ViewModel이 변경을 알리면 builder 가 다시 실행됌
                 builder: (context, viewModel, child) {
+                  // 상태에 따라 로딩, 오류, 빈 목록, 성공 화면을 선택하면됌
                   switch (viewModel.status) {
-                    case MovieHomeLoadStatus.idle:
+                    case MovieHomeLoadStatus.idle:  // 아직 요청 시작 X 
                     case MovieHomeLoadStatus.loading:
                       return const Center(child: CircularProgressIndicator());
                     case MovieHomeLoadStatus.error:

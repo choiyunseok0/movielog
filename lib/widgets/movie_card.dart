@@ -43,6 +43,8 @@ class MovieCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+
+   // 8. movie_card.dart, movie_poster.dart — 카드 완성
     final title = tmdbMovie?.title ?? movie!.title;
     final rating = tmdbMovie?.voteAverage ?? movie!.averageRating;
     final metadata = tmdbMovie != null
