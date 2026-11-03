@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../core/network/study_capture.dart';
 import '../models/rating_dto.dart';
 
 class RatingApiService {
@@ -8,6 +9,16 @@ class RatingApiService {
   final Dio _dio;
 
   Future<List<RatingDto>> fetchMyRatings(int memberId) async {
+    if (StudyCapture.enabled) {
+      await StudyCapture.pause();
+      if (StudyCapture.ratings == 'empty') return [];
+      if (StudyCapture.ratings == 'error') {
+        throw DioException(
+          requestOptions: RequestOptions(path: '/v5/members/$memberId/ratings'),
+          type: DioExceptionType.connectionError,
+        );
+      }
+    }
     final response = await _dio.get<List<dynamic>>(
       '/v5/members/$memberId/ratings',
     );
