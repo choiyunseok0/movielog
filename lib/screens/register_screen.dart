@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../view_models/sign_up_view_model.dart';
+import '../widgets/movielog_button.dart';
 
 import '../theme/app_colors.dart';
 
@@ -64,10 +68,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
     required VoidCallback onSubmitted,
     bool isPassword = false,
     bool isEmail = false,
+    CheckStatus? checkStatus,
+    VoidCallback? onCheck,
+    ValueChanged<String>? onChanged,
   }) {
     final hasInput = controller.text.isNotEmpty;
     final error = validator(controller.text);
-    final hasError = hasInput && error != null;
+    final duplicate = checkStatus == CheckStatus.duplicated;
+    final hasError = duplicate || (hasInput && error != null);
+    final checkError = duplicate
+        ? '이미 사용 중인 $label입니다.'
+        : checkStatus == CheckStatus.error
+        ? '확인하지 못했어요. 다시 시도해 주세요.'
+        : null;
     final border = OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
       borderSide: const BorderSide(color: AppColors.inputBorder),
@@ -81,67 +94,90 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
-        TextFormField(
-          key: Key(fieldKey),
-          controller: controller,
-          focusNode: focusNode,
-          style: Theme.of(context).textTheme.bodyMedium,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: const TextStyle(color: AppColors.outline),
-            filled: true,
-            fillColor: hasError
-                ? AppColors.inputErrorBackground
-                : AppColors.inputBackground,
-            isDense: true,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: TextFormField(
+                key: Key(fieldKey),
+                controller: controller,
+                focusNode: focusNode,
+                style: Theme.of(context).textTheme.bodyMedium,
+                decoration: InputDecoration(
+                  hintText: hint,
+                  errorText: checkError,
+                  hintStyle: const TextStyle(color: AppColors.outline),
+                  filled: true,
+                  fillColor: hasError
+                      ? AppColors.inputErrorBackground
+                      : AppColors.inputBackground,
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  border: border,
+                  enabledBorder: border,
+                  focusedBorder: border.copyWith(
+                    borderSide: const BorderSide(color: AppColors.primary),
+                  ),
+                  errorBorder: border.copyWith(
+                    borderSide: const BorderSide(color: AppColors.inputError),
+                  ),
+                  focusedErrorBorder: border.copyWith(
+                    borderSide: const BorderSide(color: AppColors.inputError),
+                  ),
+                  errorStyle: const TextStyle(
+                    color: AppColors.inputError,
+                    fontSize: 12,
+                  ),
+                  errorMaxLines: 2,
+                  suffixIcon: hasInput
+                      ? Icon(
+                          hasError ? Icons.error_outline : Icons.check_circle,
+                          color: hasError
+                              ? AppColors.inputError
+                              : AppColors.primary,
+                          size: 20,
+                        )
+                      : null,
+                ),
+                obscureText: isPassword,
+                keyboardType: isEmail
+                    ? TextInputType.emailAddress
+                    : TextInputType.text,
+                autocorrect: !isEmail && !isPassword,
+                enableSuggestions: !isPassword,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                textInputAction: isPassword
+                    ? TextInputAction.done
+                    : TextInputAction.next,
+                validator: validator,
+                onChanged: (value) {
+                  onChanged?.call(value);
+                  setState(() {});
+                },
+                onFieldSubmitted: (_) => onSubmitted(),
+              ),
             ),
-            border: border,
-            enabledBorder: border,
-            focusedBorder: border.copyWith(
-              borderSide: const BorderSide(color: AppColors.primary),
-            ),
-            errorBorder: border.copyWith(
-              borderSide: const BorderSide(color: AppColors.inputError),
-            ),
-            focusedErrorBorder: border.copyWith(
-              borderSide: const BorderSide(color: AppColors.inputError),
-            ),
-            errorStyle: const TextStyle(
-              color: AppColors.inputError,
-              fontSize: 12,
-            ),
-            errorMaxLines: 2,
-            suffixIcon: hasInput
-                ? Icon(
-                    hasError ? Icons.error_outline : Icons.check_circle,
-                    color: hasError ? AppColors.inputError : AppColors.primary,
-                    size: 20,
-                  )
-                : null,
-          ),
-          obscureText: isPassword,
-          keyboardType: isEmail
-              ? TextInputType.emailAddress
-              : TextInputType.text,
-          autocorrect: !isEmail && !isPassword,
-          enableSuggestions: !isPassword,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          textInputAction: isPassword
-              ? TextInputAction.done
-              : TextInputAction.next,
-          validator: validator,
-          onChanged: (_) => setState(() {}),
-          onFieldSubmitted: (_) => onSubmitted(),
+            if (checkStatus != null) ...[
+              const SizedBox(width: 8),
+              MovieLogButton(
+                label: '중복 확인',
+                isLoading: checkStatus == CheckStatus.checking,
+                onPressed: error == null ? onCheck : null,
+              ),
+            ],
+          ],
         ),
+        if (checkStatus == CheckStatus.available) Text('사용할 수 있는 $label입니다.'),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.watch<SignUpViewModel?>();
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -182,6 +218,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             label: '닉네임',
                             hint: '닉네임을 입력해주세요',
                             fieldKey: 'nicknameField',
+                            checkStatus: vm?.nicknameCheckStatus,
+                            onChanged: vm?.onNicknameChanged,
+                            onCheck: vm == null
+                                ? null
+                                : () => vm.checkNickname(
+                                    _nicknameController.text,
+                                  ),
                             controller: _nicknameController,
                             focusNode: _nicknameFocusNode,
                             validator: (value) {
@@ -199,6 +242,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             label: '이메일',
                             hint: '이메일 주소를 입력해주세요',
                             fieldKey: 'emailField',
+                            checkStatus: vm?.emailStatus,
+                            onChanged: vm?.onEmailChanged,
+                            onCheck: vm == null
+                                ? null
+                                : () => vm.checkEmail(_emailController.text),
                             controller: _emailController,
                             focusNode: _emailFocusNode,
                             validator: _validateEmail,
@@ -244,17 +292,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   setState(() => _agreedToTerms = value),
                             ),
                             const SizedBox(height: 16),
-                            ElevatedButton(
+                            MovieLogButton(
                               key: const Key('registerButton'),
+                              label: '가입하기',
+                              width: double.infinity,
                               onPressed: _canSubmit ? _submit : null,
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: const Size.fromHeight(56),
-                                elevation: 0,
-                                disabledBackgroundColor:
-                                    AppColors.disabledPrimary,
-                                disabledForegroundColor: AppColors.onPrimary,
-                              ),
-                              child: const Text('가입하기'),
                             ),
                             const SizedBox(height: 24),
                             Row(

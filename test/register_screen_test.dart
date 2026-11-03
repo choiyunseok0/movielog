@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movielog/widgets/movielog_button.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:movielog/screens/register_screen.dart';
 
@@ -44,7 +45,7 @@ void main() {
   testWidgets('모든 입력과 약관이 유효할 때만 가입할 수 있다', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: RegisterScreen()));
     final button = find.byKey(const Key('registerButton'));
-    bool canSubmit() => tester.widget<ElevatedButton>(button).onPressed != null;
+    bool canSubmit() => tester.widget<MovieLogButton>(button).onPressed != null;
     expect(canSubmit(), isFalse);
 
     await tester.enterText(find.byKey(const Key('nicknameField')), '리야');

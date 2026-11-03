@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movielog/widgets/movielog_button.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
@@ -44,7 +45,7 @@ void main() {
     AppRouter.router.go('/register');
     await tester.pumpAndSettle();
     final button = find.byKey(const Key('registerButton'));
-    expect(tester.widget<ElevatedButton>(button).onPressed, isNull);
+    expect(tester.widget<MovieLogButton>(button).onPressed, isNull);
     for (final entry in {
       'nicknameField': '무비러버',
       'emailField': 'movie@example.com',
@@ -55,7 +56,7 @@ void main() {
       await tester.enterText(field, entry.value);
     }
     await tester.pump();
-    expect(tester.widget<ElevatedButton>(button).onPressed, isNull);
+    expect(tester.widget<MovieLogButton>(button).onPressed, isNull);
     final terms = find.byKey(const Key('termsCheckbox'));
     await tester.ensureVisible(terms);
     await tester.tap(terms);

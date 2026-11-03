@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-import '../models/check_result.dart';
+import '../models/member_check_result.dart';
 
 class MemberCheckService {
   MemberCheckService(this._dio);
