@@ -21,6 +21,9 @@ class TmdbMovieService {
     return TmdbMoviePageDto.fromJson(response.data!);
   }
 
+
+
+  ////2-6. tmdb_movie_service.dart — Discover API 호출 (2-7.tmdb_movie_dto.dart)
   Future<TmdbMoviePageDto> discoverMovies({
     int page = 1,
     String? withGenres,
@@ -33,10 +36,13 @@ class TmdbMovieService {
         'sort_by': 'popularity.desc',
         'include_adult': false,
         'include_video': false,
+
+        // 장르 조건이 있을 때만 요청에 포함한다
         if (withGenres != null && withGenres.isNotEmpty)
           'with_genres': withGenres,
       },
     );
+    // 응답 JSON을 페이지 DTO로 변환해 반환한다
     return TmdbMoviePageDto.fromJson(response.data!);
   }
 
