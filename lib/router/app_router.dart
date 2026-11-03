@@ -41,11 +41,14 @@ abstract final class AppRouter {
         branches: [
           StatefulShellBranch(
             routes: [
+              // 2. app_route.dart. : ViewModel 생성 & 첫 요청 시작 (3.movie_home_view_model.dart)
               GoRoute(
                 path: homePath,
                 builder: (context, state) => ChangeNotifierProvider(
                   create: (context) =>
+                      // 공통 Service를 가져와 홈 ViewModel에 전달한다
                       MovieHomeViewModel(context.read<TmdbMovieService>())
+                        // 생성한 ViewModel에서 첫 요청 시작 (인기영화 5개)
                         ..loadPopular(),
                   child: const HomeScreen(),
                 ),
@@ -54,19 +57,24 @@ abstract final class AppRouter {
           ),
           StatefulShellBranch(
             routes: [
+              //// 2-1. app_router.dart : 영화 목록 ViewModel 생성 (movie_list_view_model.dart)
+              //// 영화 탭의 경로인 '/movies'에서 시작
               GoRoute(
                 path: moviesPath,
                 builder: (context, state) {
+                  
                   final genres =
                       state.uri.queryParameters['genres']
                           ?.split(',')
                           .map(int.tryParse)
                           .whereType<int>()
                           .where((id) => id > 0)
-                          .toSet()
+                          .toSet()  // 중복 아이디 제거
                           .toList() ??
-                      const <int>[];
+                      const <int>[];  // 장르 없을시 빈 목록 사용
+
                   return ChangeNotifierProvider(
+                    // 공통 Service를 전달해 영화 목록 ViewModel을 만듬
                     create: (context) =>
                         MovieListViewModel(context.read<TmdbMovieService>())
                           ..load(genreIds: genres),
