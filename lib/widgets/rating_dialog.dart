@@ -3,8 +3,13 @@ import 'package:flutter/material.dart';
 import 'movie_rating_input.dart';
 
 class RatingDialog extends StatefulWidget {
-  const RatingDialog({super.key, this.initialRating = 0});
+  const RatingDialog({
+    super.key,
+    required this.movieId,
+    this.initialRating = 0,
+  });
 
+  final int movieId;
   final double initialRating;
 
   @override

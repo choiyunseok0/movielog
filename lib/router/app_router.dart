@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
-import '../data/mock_movies.dart';
+import '../data/services/tmdb_movie_service.dart';
+import '../data/models/tmdb_movie_dto.dart';
+import '../view_models/movie_home_view_model.dart';
+
+import '../view_models/movie_list_view_model.dart';
 import '../screens/home_screen.dart';
 import '../screens/main_screen.dart';
 import '../screens/movie_detail_screen.dart';
@@ -38,7 +43,12 @@ abstract final class AppRouter {
             routes: [
               GoRoute(
                 path: homePath,
-                builder: (context, state) => const HomeScreen(),
+                builder: (context, state) => ChangeNotifierProvider(
+                  create: (context) =>
+                      MovieHomeViewModel(context.read<TmdbMovieService>())
+                        ..loadPopular(),
+                  child: const HomeScreen(),
+                ),
               ),
             ],
           ),
@@ -47,11 +57,21 @@ abstract final class AppRouter {
               GoRoute(
                 path: moviesPath,
                 builder: (context, state) {
-                  final genres = state.uri.queryParameters['genres']
-                      ?.split(',')
-                      .where(movieGenres.contains)
-                      .toSet();
-                  return MovieListScreen(selectedGenres: genres ?? const {});
+                  final genres =
+                      state.uri.queryParameters['genres']
+                          ?.split(',')
+                          .map(int.tryParse)
+                          .whereType<int>()
+                          .where((id) => id > 0)
+                          .toSet()
+                          .toList() ??
+                      const <int>[];
+                  return ChangeNotifierProvider(
+                    create: (context) =>
+                        MovieListViewModel(context.read<TmdbMovieService>())
+                          ..load(genreIds: genres),
+                    child: MovieListScreen(selectedGenres: genres),
+                  );
                 },
               ),
             ],
@@ -77,7 +97,15 @@ abstract final class AppRouter {
             );
           }
 
-          return MovieDetailScreen(movieId: movieId);
+          final movie = state.extra is TmdbMovieDto
+              ? state.extra as TmdbMovieDto
+              : null;
+          if (movie != null && movie.id != movieId) {
+            return const Scaffold(
+              body: Center(child: Text('영화 정보를 찾을 수 없습니다.')),
+            );
+          }
+          return MovieDetailScreen(movieId: movieId, tmdbMovie: movie);
         },
       ),
     ],

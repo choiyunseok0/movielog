@@ -3,12 +3,15 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../data/mock_movies.dart';
+import '../data/models/tmdb_movie_dto.dart';
+import '../widgets/movie_poster.dart';
 import '../widgets/rating_dialog.dart';
 
 class MovieDetailScreen extends StatefulWidget {
-  const MovieDetailScreen({super.key, required this.movieId});
+  const MovieDetailScreen({super.key, required this.movieId, this.tmdbMovie});
 
   final int movieId;
+  final TmdbMovieDto? tmdbMovie;
 
   @override
   State<MovieDetailScreen> createState() => _MovieDetailScreenState();
@@ -21,7 +24,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
   Future<void> _openRatingDialog() async {
     final rating = await showDialog<double>(
       context: context,
-      builder: (context) => RatingDialog(initialRating: _myRating ?? 0),
+      builder: (context) =>
+          RatingDialog(movieId: widget.movieId, initialRating: _myRating ?? 0),
     );
 
     if (!mounted || rating == null) return;
@@ -53,14 +57,24 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final movie = findMovieById(widget.movieId);
+    final tmdbMovie = widget.tmdbMovie;
+    final movie = tmdbMovie == null ? findMovieById(widget.movieId) : null;
 
-    if (movie == null) {
+    if ((movie == null && tmdbMovie == null) ||
+        (tmdbMovie != null && tmdbMovie.id != widget.movieId)) {
       return Scaffold(
         appBar: AppBar(),
         body: const Center(child: Text('영화 정보를 찾을 수 없습니다.')),
       );
     }
+
+    final title = tmdbMovie?.title ?? movie!.title;
+    final overview = tmdbMovie?.overview ?? movie!.synopsis;
+    final averageRating = tmdbMovie?.voteAverage ?? movie!.averageRating;
+    final starRating = tmdbMovie != null ? averageRating / 2 : averageRating;
+    final metadata = tmdbMovie != null
+        ? (tmdbMovie.releaseDate.isEmpty ? '개봉일 정보 없음' : tmdbMovie.releaseDate)
+        : '${movie!.year} · ${movie.genre} · ${movie.durationMinutes}분';
 
     return Scaffold(
       appBar: AppBar(
@@ -100,24 +114,23 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         children: [
           AspectRatio(
             aspectRatio: 1.05,
-            child: Image.asset(
-              movie.posterAsset,
-              fit: BoxFit.cover,
-              semanticLabel: '${movie.title} 포스터',
-            ),
+            child: tmdbMovie != null
+                ? MoviePoster(url: tmdbMovie.posterUrl, title: title)
+                : Image.asset(
+                    movie!.posterAsset,
+                    fit: BoxFit.cover,
+                    semanticLabel: '$title 포스터',
+                  ),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  movie.title,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
+                Text(title, style: Theme.of(context).textTheme.headlineSmall),
                 const SizedBox(height: 8),
                 Text(
-                  '${movie.year} · ${movie.genre} · ${movie.durationMinutes}분',
+                  metadata,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -126,7 +139,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                 Row(
                   children: [
                     RatingBarIndicator(
-                      rating: movie.averageRating,
+                      rating: starRating,
                       itemCount: 5,
                       itemSize: 22,
                       unratedColor: Theme.of(context)
@@ -139,41 +152,37 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      movie.averageRating.toStringAsFixed(1),
+                      tmdbMovie != null
+                          ? '${averageRating.toStringAsFixed(1)} / 10'
+                          : averageRating.toStringAsFixed(1),
                       style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '(1,245)',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: movie.tags
-                      .map(
-                        (tag) => Chip(
-                          label: Text(tag),
-                          backgroundColor: Theme.of(context)
-                              .colorScheme
-                              .surfaceContainerHighest,
-                          side: BorderSide.none,
-                        ),
-                      )
-                      .toList(),
-                ),
+                if (movie != null)
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: movie.tags
+                        .map(
+                          (tag) => Chip(
+                            label: Text(tag),
+                            backgroundColor: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest,
+                            side: BorderSide.none,
+                          ),
+                        )
+                        .toList(),
+                  ),
                 const SizedBox(height: 24),
                 const Divider(),
                 const SizedBox(height: 20),
                 Text('시놉시스', style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 8),
                 Text(
-                  movie.synopsis,
+                  overview.isEmpty ? '줄거리 정보가 없습니다.' : overview,
                   style: Theme.of(context).textTheme.bodyLarge
                       ?.copyWith(height: 1.65),
                 ),
