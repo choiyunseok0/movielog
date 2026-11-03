@@ -56,8 +56,9 @@ class SignUpViewModel extends ChangeNotifier {
     final requested = value.trim();
     // 입력값이 비어있거나 || 버튼에서 넘긴값이 VM이 기억하는 현재 입력값과 다르거나 || canCheckNickname == flase
     // 라면 서버에 요청하지 않음
-    if (requested.isEmpty || requested != _currentNickname || !canCheckNickname)
+    if (requested.isEmpty || requested != _currentNickname || !canCheckNickname) {
       return;
+    }
 
     final version = ++_requestVersion;
     nicknameCheckStatus = CheckStatus.checking;
@@ -68,8 +69,9 @@ class SignUpViewModel extends ChangeNotifier {
       final available = await _service.checkNickname(requested);
       if (_disposed ||
           version != _requestVersion ||
-          _currentNickname != requested)
+          _currentNickname != requested) {
         return;
+      }
       nicknameCheckStatus = available
           ? CheckStatus.available
           : CheckStatus.duplicated;
@@ -78,8 +80,9 @@ class SignUpViewModel extends ChangeNotifier {
     } on DioException {
       if (_disposed ||
           version != _requestVersion ||
-          _currentNickname != requested)
+          _currentNickname != requested) {
         return;
+      }
       nicknameCheckStatus = CheckStatus.error;
       nicknameErrorText = '중복 확인에 실패했습니다. 다시 시도해 주세요.';
     }
@@ -111,8 +114,9 @@ class SignUpViewModel extends ChangeNotifier {
     final requested = value.trim();
     // 입력값이 비어있거나 || 버튼에서 넘긴값이 VM이 기억하는 현재 입력값과 다르거나 || canCheckEmail == flase
     // 라면 서버에 요청하지 않음
-    if (requested.isEmpty || requested != _currentEmail || !canCheckEmail)
+    if (requested.isEmpty || requested != _currentEmail || !canCheckEmail) {
       return;
+    }
 
     final version = ++_emailRequestVersion;
     emailStatus = CheckStatus.checking;
@@ -123,16 +127,18 @@ class SignUpViewModel extends ChangeNotifier {
       final available = await _service.checkEmail(requested);
       if (_disposed ||
           version != _emailRequestVersion ||
-          _currentEmail != requested)
+          _currentEmail != requested) {
         return;
+      }
       emailStatus = available ? CheckStatus.available : CheckStatus.duplicated;
       emailErrorText = available ? null : '이미 사용 중인 이메일입니다.';
       if (!available) _duplicatedEmail = requested;
     } on DioException {
       if (_disposed ||
           version != _emailRequestVersion ||
-          _currentEmail != requested)
+          _currentEmail != requested) {
         return;
+      }
       emailStatus = CheckStatus.error;
       emailErrorText = '중복 확인에 실패했습니다. 다시 시도해 주세요.';
     }
