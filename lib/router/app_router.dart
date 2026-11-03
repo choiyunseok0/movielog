@@ -1,3 +1,6 @@
+import '../data/services/rating_api_service.dart';
+import '../screens/my_ratings_screen.dart';
+import '../view_models/my_ratings_view_model.dart';
 import '../data/services/member_check_service.dart';
 import '../view_models/sign_up_view_model.dart';
 
@@ -104,6 +107,16 @@ abstract final class AppRouter {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: '$myPagePath/ratings',
+        builder: (context, state) => ChangeNotifierProvider(
+          create: (context) => MyRatingsViewModel(
+            context.read<RatingApiService>(),
+            context.read<TmdbMovieService>(),
+          )..load(),
+          child: const MyRatingsScreen(),
+        ),
       ),
       GoRoute(
         path: '$moviesPath/:movieId',

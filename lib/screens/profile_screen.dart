@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../widgets/common_app_bar.dart';
 import '../widgets/favorite_genres.dart';
@@ -23,19 +24,26 @@ class ProfileBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SafeArea(
+    return SafeArea(
       child: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(20, 32, 20, 32),
+        padding: const EdgeInsets.fromLTRB(20, 32, 20, 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ProfileHeader(),
-            SizedBox(height: 24),
-            ProfileEditButton(),
-            SizedBox(height: 40),
-            ProfileStats(),
-            SizedBox(height: 40),
-            FavoriteGenres(),
+            const ProfileHeader(),
+            const SizedBox(height: 24),
+            const ProfileEditButton(),
+            const SizedBox(height: 40),
+            const ProfileStats(),
+            const SizedBox(height: 24),
+            ListTile(
+              leading: const Icon(Icons.star_outline),
+              title: const Text('내가 등록한 평점'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/my/ratings'),
+            ),
+            const SizedBox(height: 24),
+            const FavoriteGenres(),
           ],
         ),
       ),

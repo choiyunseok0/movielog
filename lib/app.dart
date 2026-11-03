@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'core/network/tmdb_client.dart';
 import 'core/network/movie_log_client.dart';
 import 'data/services/member_check_service.dart';
+import 'data/services/rating_api_service.dart';
 import 'data/services/tmdb_movie_service.dart';
 
 import 'router/app_router.dart';
@@ -22,8 +23,12 @@ class MovieLogApp extends StatelessWidget {
         Provider<TmdbMovieService>(
           create: (_) => TmdbMovieService(createTmdbClient()),
         ),
+        Provider(create: (_) => createMovieLogClient()),
         Provider<MemberCheckService>(
-          create: (_) => MemberCheckService(createMovieLogClient()),
+          create: (context) => MemberCheckService(context.read()),
+        ),
+        Provider<RatingApiService>(
+          create: (context) => RatingApiService(context.read()),
         ),
       ],
       child: MaterialApp.router(
