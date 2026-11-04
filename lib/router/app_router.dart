@@ -1,3 +1,9 @@
+import '../data/services/rating_api_service.dart';
+import '../screens/my_ratings_screen.dart';
+import '../view_models/my_ratings_view_model.dart';
+import '../data/services/member_check_service.dart';
+import '../view_models/sign_up_view_model.dart';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -31,8 +37,17 @@ abstract final class AppRouter {
       ),
       GoRoute(
         path: registerPath,
-        builder: (context, state) =>
-            RegisterScreen(onRegistered: () => context.go(homePath)),
+        builder: (context, state) {
+          final service = context.read<MemberCheckService?>();
+          final screen = RegisterScreen(
+            onRegistered: () => context.go(homePath),
+          );
+          if (service == null) return screen;
+          return ChangeNotifierProvider(
+            create: (_) => SignUpViewModel(service),
+            child: screen,
+          );
+        },
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -62,16 +77,15 @@ abstract final class AppRouter {
               GoRoute(
                 path: moviesPath,
                 builder: (context, state) {
-                  
                   final genres =
                       state.uri.queryParameters['genres']
                           ?.split(',')
                           .map(int.tryParse)
                           .whereType<int>()
                           .where((id) => id > 0)
-                          .toSet()  // 중복 아이디 제거
+                          .toSet() // 중복 아이디 제거
                           .toList() ??
-                      const <int>[];  // 장르 없을시 빈 목록 사용
+                      const <int>[]; // 장르 없을시 빈 목록 사용
 
                   return ChangeNotifierProvider(
                     // 공통 Service를 전달해 영화 목록 ViewModel을 만듬
@@ -93,6 +107,16 @@ abstract final class AppRouter {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: '$myPagePath/ratings',
+        builder: (context, state) => ChangeNotifierProvider(
+          create: (context) => MyRatingsViewModel(
+            context.read<RatingApiService>(),
+            context.read<TmdbMovieService>(),
+          )..load(),
+          child: const MyRatingsScreen(),
+        ),
       ),
       GoRoute(
         path: '$moviesPath/:movieId',
