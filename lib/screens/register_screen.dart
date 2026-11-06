@@ -1,3 +1,4 @@
+// 사용자가 보는 회원가입 화면
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

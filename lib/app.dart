@@ -1,3 +1,5 @@
+// 만든 객체를 연결하기
+// 여러 화면이 사용할 Client & Service를 앱 사우이에서 제공하기 위함
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
